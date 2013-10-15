@@ -1,4 +1,4 @@
-//lenka
+//lenkamartin
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -16,13 +16,13 @@ private:
 public:
 	/**
 	* Encrypts/decrypts given data with AES - 128.
-	* 
+	*
 	* @param key 128 bit long key
 	* @param iv initialisation vector
 	* @param data input data
 	* @param outData output data
-	* @param mode 0 - encryption ; 1 - decryption 
-	* 
+	* @param mode 0 - encryption ; 1 - decryption
+	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int cryptoSym(unsigned char key[32] , unsigned char iv[32] , unsigned char* data , unsigned char* outData  , int mode);
