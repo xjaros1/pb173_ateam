@@ -67,6 +67,57 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int randGenRSA(unsigned char publicKey , unsigned char privateKey);
+
+	/**
+	* Requests login to server.
+	* 
+	* @param requestType type of request
+	* @param login user's login
+	* @param password user's password
+	*
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int loginRequest(requestType rT , unsigned char* login , unsigned char password);
+
+	/**
+	* Requests logout from server.
+	*
+	* @param requestType type of request
+	* @param login user's login
+	*
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int logoutRequest(requestType rT , unsigned char* login);
+
+	/**
+	* Requests registration on server.
+	*
+	* @param requestType type of request
+	* @param myCert user's certificate
+	*
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int registrationRequest(requestType rT , cert myCert);
+
+	/**
+	* Requests partner's adress from server, based on partner's login.
+	*
+	* @param requestType type of request
+	* @param partnerLogin partner's login
+	*
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int adressRequest(requestType rt , unsigned char* partnerLogin);
+
+	/**
+	* Request signed certificate from CA.
+	*
+	* @param requestType type of request
+	* @param PI user's personal info
+	*
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int certificateRequest(requestType rt , personInfo PI);
 };
 
 #endif //CLIENT

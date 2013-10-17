@@ -113,6 +113,14 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int logout(userList onlineUsers , unsigned char* login);
+
+	/**
+	* Accepts user's request, takes action based on request type.
+	*
+	* @param requestType type of request
+	* @return returns zero when succesful, nonzero value otherwise
+	*/
+	int requestAccept(requestType rT);
 };
 
 #endif //CERTIFICATE_AUTHORITY
