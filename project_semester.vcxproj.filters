@@ -30,6 +30,9 @@
     <ClCompile Include="server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="serverTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="certification_authority.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="minunit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,0 +1,41 @@
+﻿Build started 20. 10. 2013 22:49:54.
+     1>Project "C:\Users\Lenka\Documents\GitHub\pb173_ateam\project_semester.vcxproj" on node 2 (ClCompile target(s)).
+     1>ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt client.cpp
+         client.cpp
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(89): error C2061: syntax error : identifier 'requestType'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(99): error C2061: syntax error : identifier 'requestType'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(109): error C2061: syntax error : identifier 'requestType'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(119): error C2061: syntax error : identifier 'requestType'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(129): error C2061: syntax error : identifier 'requestType'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(190): error C2065: 'requestType' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(190): error C2146: syntax error : missing ';' before identifier 'rT'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(190): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(192): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(196): error C2065: 'requestType' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(196): error C2146: syntax error : missing ';' before identifier 'rT'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(196): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(197): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(201): error C2065: 'requestType' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(201): error C2146: syntax error : missing ';' before identifier 'rT'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(201): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(203): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(207): error C2065: 'requestType' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(207): error C2146: syntax error : missing ';' before identifier 'rT'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(207): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(209): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(213): error C2065: 'requestType' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(213): error C2146: syntax error : missing ';' before identifier 'rT'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(213): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(214): error C2065: 'PersonInfo' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(214): error C2146: syntax error : missing ';' before identifier 'PI'
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(214): error C2065: 'PI' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(215): error C2065: 'rT' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(215): error C2065: 'PI' : undeclared identifier
+     1>c:\users\lenka\documents\github\pb173_ateam\client.h(221): error C2664: 'Client::sendData' : cannot convert parameter 1 from 'unsigned char *' to 'adress'
+                 There is no context in which this conversion is possible
+     1>Done Building Project "C:\Users\Lenka\Documents\GitHub\pb173_ateam\project_semester.vcxproj" (ClCompile target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.51

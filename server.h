@@ -1,10 +1,25 @@
 #ifndef SERVER_H
 #define SERVER_H
+#include <list>
+
+struct User
+	{
+		std::string login;
+		std::string password;
+		cert certificate;
+		User(std::string login,std::string password,cert certificate):login(login),password(password),certificate(certificate){}
+	}
+
+	struct cert
+	{
+
+	}
 
 class Server{
+	
 private:
-	userList registeredUsers;
-	userList onlineUsers;
+	std::list<User*> registeredUsers;
+	std::list<User*> onlineUsers;
 	cert certificate;
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
@@ -29,7 +44,7 @@ public:
 	*
 	* @return zero when succesful, nonzero value when error occurs
 	*/
-	int registration(userList registeredUsers , unsigned char* login , unsigned char* pwd , cert userCert);
+	int registration(std::string login , std::string pwd , cert userCert);
 
 	/**
 	* Generates random AES key.

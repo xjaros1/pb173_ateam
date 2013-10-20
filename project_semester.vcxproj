@@ -81,10 +81,12 @@
     <ClCompile Include="client.cpp" />
     <ClCompile Include="project_semester.cpp" />
     <ClCompile Include="server.cpp" />
+    <ClCompile Include="serverTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="certification_authority.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="minunit.h" />
     <ClInclude Include="server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

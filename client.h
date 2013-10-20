@@ -1,19 +1,21 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#define mu_assert(message, test) do { if (!(test)) return message; } while (0)
-#define mu_run_test(test) do { char *message = test(); tests_run++; \
-                                if (message) return message; } while (0)
 #include <iostream>
+#include "minunit.h"
 
 extern int tests_run;
+
+/*typedef int persInfo;
+typedef int cert;
+typedef int adress;*/
 
 class Client{
 private:
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
 	unsigned char symKey[32];
-	unsigned char iv[32];
+	unsigned char iv[32];	// inicializacny vektor
 	persInfo PI;
 	cert myCert;
 	cert partnerCert;
