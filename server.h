@@ -117,7 +117,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int login(userList onlineUsers , unsigned char* login);
+	int login(std::string login,std::string password);
 
 	/**
 	* Removes user from list of online users.
@@ -127,7 +127,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int logout(userList onlineUsers , unsigned char* login);
+	int logout(std::string login);
 
 	/**
 	* Accepts user's request, takes action based on request type.
