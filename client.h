@@ -10,13 +10,27 @@ extern int tests_run;
 typedef int cert;
 typedef int adress;*/
 
+struct adress{
+	std::string IP;
+
+};
+struct cert{
+
+};
+struct personInfo{
+
+};
+enum requestType{
+	LOGIN, LOGOUT, REG, ADRESS, CA
+};
+
 class Client{
 private:
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
 	unsigned char symKey[32];
 	unsigned char iv[32];	// inicializacny vektor
-	persInfo PI;
+	personInfo PI;
 	cert myCert;
 	cert partnerCert;
 	adress myAdress;
@@ -187,38 +201,38 @@ public:
 	static Client cl;
 	static unsigned char* login;
 	static char* test_loginRequest(){
-		requestType rT;
-		unsigned char* password;
-		mu_assert("Error login request", cl.loginRequest(rT, login, password));
+
+		unsigned char* password = (unsigned char*)"POKUS";
+		strcpy( (char*) login, "Martin");
+		mu_assert("Error login request", cl.loginRequest(requestType::LOGIN, login, password) == 0);
 		return 0;
 	}
 	static char* test_logoutRequest(){
-		requestType rT;
-		mu_assert("Error logout request", cl.logoutRequest(rT, login));
+
+		strcpy( (char*) login, "Martin");
+		mu_assert("Error logout request", cl.logoutRequest(requestType::LOGOUT, login) == 0);
 		return 0;
 	}
 	static char* test_registrationRequest(){
-		requestType rT;
-		cert myCert;
-		mu_assert("Error registration request", cl.registrationRequest(rT, myCert) );
+		cert myCert = cert();
+		mu_assert("Error registration request", cl.registrationRequest(requestType::REG, myCert) ==0 );
 		return 0;
 	}
 	static char* test_adressRequest(){
-		requestType rT;
-		unsigned char* partnerLogin;
-		mu_assert("Error adress request", cl.adressRequest(rT, partnerLogin));
+		unsigned char* partnerLogin = (unsigned char*) "Lenka";
+		mu_assert("Error adress request", cl.adressRequest(requestType::ADRESS, partnerLogin) == 0);
 		return 0;
 	}
 	static char* test_certRequest(){
-		requestType rT;
-		PersonInfo PI;
-		mu_assert("Error cert request", cl.certificateRequest(rT, PI));
+		personInfo PI = personInfo();
+		mu_assert("Error cert request", cl.certificateRequest(requestType::CA, PI) == 0);
 		return 0;
 	}
 	static char* test_sendData(){
-		unsigned char* partnerLogin;
-		unsigned char* data;
-		mu_assert("Error send data", cl.sendData(partnerLogin, data));
+
+		adress partnerAdress = adress();
+		unsigned char* data = (unsigned char*) "SENDING DATA";
+		mu_assert("Error send data", cl.sendData(partnerAdress, data));
 		return 0;
 	}
 	static char* all_run_test(){
