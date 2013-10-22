@@ -16,7 +16,7 @@ public:
 	* 
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int sign(persInfo userInfo , unsigned char userPublicKey[128]);
+	cert sign(persInfo userInfo);
 
 	/**
 	* Sends certificate to specified adress.
@@ -53,6 +53,8 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int requestAccept(requestType rT);
+	unsigned char* getPubKey();
+	bool verifyCert(cert);
 };
 
 

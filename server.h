@@ -136,6 +136,8 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int requestAccept(requestType rT);
+	User* getUser(std::string login);
+	User* getOnlineUser(std::string login);
 };
 
 #endif //CERTIFICATE_AUTHORITY
