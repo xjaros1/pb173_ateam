@@ -79,6 +79,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="caTest.cpp" />
     <ClCompile Include="certification_authority.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="project_semester.cpp" />

@@ -33,6 +33,9 @@
     <ClCompile Include="serverTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="caTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
