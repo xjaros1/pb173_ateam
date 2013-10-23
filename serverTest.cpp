@@ -2,6 +2,11 @@
 #include "minunit.h"
 #include <string>
 
+extern int tests_run;
+unsigned char TestCrypto::keySym[32] = "0123456789abcdef";
+unsigned char TestCrypto::iv[32] = {0};
+unsigned char TestCrypto::data[20] = "test crypto";
+
 using namespace std;
 
  static char* test_registration() {
@@ -83,4 +88,58 @@ using namespace std;
 	  mu_assert("logout of offline user passed without error",server->logout("Lenka")!=0);
 	  
   }
-	  
+
+
+class TestCryptoClient{
+public:
+	static unsigned char keySym[32];
+	static unsigned char keyPrivate[128];
+	static unsigned char keyPublic[128];
+	static unsigned char data[20];
+	static unsigned char output[20];
+	static unsigned char test[20];
+	static unsigned char iv[32];
+	static Server s1;
+
+	static char* test_cryptoSym(){
+
+		sl.cryptoSym(keySym, iv, data, output, 1);
+
+		sl.cryptoSym(keySym, iv, output, test, 0);
+
+		mu_assert("Error crypto", strcmp((const char*) test, (const char*)data) == 0);
+		return 0;
+	}
+	static char* test_cryptoAsym(){
+
+		sl.cryptoAsym(keyPublic, data, output, 1);
+
+		sl.cryptoAsym(keyPrivate, output, test, 0);
+
+		mu_assert("Error crypto asym", strcmp( (const char*) test, (const char*) data) == 0);
+		return 0;
+	}
+	static char* test_generAES()
+	{
+		keySym[0] = 0;
+		sl.randGenAES(keySym);
+		mu_assert("Wrong gener sym key", strlen( (const char*) keySym) != 0);
+		return 0;
+	}
+	static char* test_generRSA()
+	{
+		keyPrivate[0] = 0;
+		keyPublic[0] = 0;
+		sl.randGenRSA(keyPublic, keyPrivate);
+		mu_assert("Wrong gener asym key", (strlen((const char*)keySym) != 0 && strlen((const char*)keyPublic)!= 0 ));
+		return 0;
+	}
+	static char* all_run_tests(){
+
+		mu_run_test(test_cryptoAsym);
+		mu_run_test(test_cryptoSym);
+		mu_run_test(test_generAES);
+		mu_run_test(test_generRSA);
+		return 0;
+	}
+};
