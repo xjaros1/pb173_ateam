@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="certification_authority.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="clientTest.h" />
     <ClInclude Include="minunit.h" />
     <ClInclude Include="server.h" />
   </ItemGroup>

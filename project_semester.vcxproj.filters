@@ -50,5 +50,8 @@
     <ClInclude Include="minunit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
