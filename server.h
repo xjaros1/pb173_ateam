@@ -8,12 +8,15 @@ struct User
 		std::string password;
 		cert certificate;
 		User(std::string login,std::string password,cert certificate):login(login),password(password),certificate(certificate){}
-	}
+	};
 
 	struct cert
 	{
 
-	}
+	};
+	enum requestType{
+
+	};
 
 class Server{
 	
@@ -87,7 +90,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoAsym(unsigned char key* , unsigned char* data , unsigned char* outData , int mode);
+	int cryptoAsym(unsigned char* key , unsigned char* data , unsigned char* outData , int mode);
 	
 	/**
 	* Creates a hash of given data.
@@ -107,7 +110,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int sendData(adress clientAdress , unsigned char* data);
+	int sendData(char *Buf, int len, int Client);
 
 	/**
 	* Adds user into list of online users.
@@ -138,6 +141,10 @@ public:
 	int requestAccept(requestType rT);
 	User* getUser(std::string login);
 	User* getOnlineUser(std::string login);
+		
+	int startServer(int port);
+	int receiveData(char *Buf, int len, int Client);
+	int endSocket();
 };
 
 #endif //CERTIFICATE_AUTHORITY

@@ -70,7 +70,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int sendData(adress partnerAdress , unsigned char* data);
+	int sendData(char *buff, int len);
 
 	/**
 	* Generates random AES key.
@@ -141,6 +141,11 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int certificateRequest(requestType rt , personInfo PI);
+	
+	int connectTo(std::string IP, int port);
+	int receiveData(char* buff, int len);
+	int endSocket();
+
 };
 
 
