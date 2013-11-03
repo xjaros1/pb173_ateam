@@ -367,16 +367,16 @@ int Client::closeListening()
 int getInput()
 {
 	Client cl = Client();
-	char c;
-	char number;
+
+	std::string m;
 	myPacket packet;
 	adress partnerAdress;
 	bool stop = false;
 	std::istringstream s;
-	std::cin >> c >> number;
+	std::getline(std::cin, m);
 	while(!stop)
 	{
-		switch(c)
+		switch(m[0])
 		{
 		case 'h':
 				cl.connectTo("127.0.0.1", 5000);
@@ -388,10 +388,8 @@ int getInput()
 				break;
 
 		case 'c':
-				char nr[1];
-				nr[0] = number;
 				memset(packet.mystring, 0, 256);
-				packet = myPacket(256, nr,  requestType::CHOOSE);
+				packet = myPacket(256,(char*) m.substr(2,1).c_str(),  requestType::CHOOSE);
 				cl.sendData((char*)& packet, 256, 0);
 				cl.setPartnerAdress(packet.mystring);
 				break;
@@ -418,7 +416,7 @@ int getInput()
 				break;
 		}
 		if(!stop)
-			std::cin >> c >> number;
+			std::getline(std::cin, m);
 	}
 	return 0;
 }
