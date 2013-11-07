@@ -1,22 +1,20 @@
 #ifndef SERVER_H
 #define SERVER_H
+
 #include <list>
+#include <afxwin.h>
+
+#include "socket.h"
+#include "struct.h"
 
 struct User
-	{
+{
 		std::string login;
 		std::string password;
-		cert certificate;
-		User(std::string login,std::string password,cert certificate):login(login),password(password),certificate(certificate){}
-	};
-
-	struct cert
-	{
-
-	};
-	enum requestType{
-
-	};
+		cert* certificate;
+		int port;
+		User(std::string login,std::string password,cert* certificate):login(login),password(password),certificate(certificate){}
+};
 
 class Server{
 	
@@ -26,7 +24,11 @@ private:
 	cert certificate;
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
+	
 public:
+	Server();
+	//static UINT waiting(LPVOID a);
+	//static UINT answer(LPVOID s);
 	/**
 	* Checks authenticity of given certificate.
 	*
@@ -47,7 +49,7 @@ public:
 	*
 	* @return zero when succesful, nonzero value when error occurs
 	*/
-	int registration(std::string login , std::string pwd , cert userCert);
+	int registration(std::string login , std::string pwd , cert* userCert);
 
 	/**
 	* Generates random AES key.
@@ -120,7 +122,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int login(std::string login,std::string password);
+	int login(std::string login,std::string password, int port);
 
 	/**
 	* Removes user from list of online users.
@@ -138,13 +140,16 @@ public:
 	* @param requestType type of request
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int requestAccept(requestType rT);
+	int requestAccept(int rT);
 	User* getUser(std::string login);
 	User* getOnlineUser(std::string login);
 		
 	int startServer(int port);
 	int receiveData(char *Buf, int len, int Client);
 	int endSocket();
+	std::string sendlist(std::string login);
+	static string generatePassword();
+	int startClientCommunication(std::string fromC, std::string toClient);
 };
 
-#endif //CERTIFICATE_AUTHORITY
+#endif

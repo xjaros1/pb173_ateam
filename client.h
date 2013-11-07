@@ -2,41 +2,47 @@
 #define CLIENT_H
 
 #include <iostream>
-#include "minunit.h"
+#include <string>
+
+#include <afxwin.h>
 
 
+#include "socket.h"
+#include "struct.h"
+//#include "minunit.h"
 
-/*typedef int persInfo;
-typedef int cert;
-typedef int adress;*/
+
 
 struct adress{
 	std::string IP;
 
 };
-struct cert{
 
-};
-struct personInfo{
 
-};
-enum requestType{
-	LOGIN, LOGOUT, REG, ADRESS, CA
-};
+
 
 class Client{
+public:
+	bool communication;
+	SocketClient* activePartnerSocket;
 private:
+	
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
 	unsigned char symKey[32];
 	unsigned char iv[32];	// inicializacny vektor
 	personInfo PI;
+	std::string login;
 	cert myCert;
 	cert partnerCert;
 	adress myAdress;
 	adress partnerAdress;
+	SocketClient* activeServerSocket;// premenna sluzi na to aby som mohls v lubovolnej metode ked uz som sa rraz na server nepojila mohla s nim komunikovat
+	
+	int port;
+	bool stop;
 public:
-	Client() {}
+	Client(string login);
 	/**
 	* Encrypts/decrypts given data with AES - 128.
 	*
@@ -70,7 +76,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int sendData(char *buff, int len);
+	int sendData(int port);
 
 	/**
 	* Generates random AES key.
@@ -100,7 +106,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int loginRequest(requestType rT , unsigned char* login , unsigned char* password);
+	int loginRequest(std::string password);
 
 	/**
 	* Requests logout from server.
@@ -120,7 +126,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int registrationRequest(requestType rT , cert myCert);
+	int registrationRequest();
 
 	/**
 	* Requests partner's adress from server, based on partner's login.
@@ -142,10 +148,12 @@ public:
 	*/
 	int certificateRequest(requestType rt , personInfo PI);
 	
-	int connectTo(std::string IP, int port);
+	/*int connectTo(std::string IP, int port);
 	int receiveData(char* buff, int len);
-	int endSocket();
-
+	int endSocket();*/
+	int listRequest();
+	int communicationRequest(std::string);
+//static	UINT clientWaiting(LPVOID a);
 };
 
 

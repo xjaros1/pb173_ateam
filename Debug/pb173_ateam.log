@@ -1,0 +1,40 @@
+﻿Build started 4. 11. 2013 20:52:02.
+     1>Project "C:\Users\Lenka\Desktop\pb173_ateam\pb173_ateam.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\pb173_ateam.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Debug\pb173_ateam.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt client.cpp main.cpp server.cpp socket.cpp struct.cpp
+         struct.cpp
+         socket.cpp
+     1>c:\users\lenka\desktop\pb173_ateam\socket.cpp(207): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(157) : see declaration of 'strerror'
+     1>c:\users\lenka\desktop\pb173_ateam\socket.cpp(218): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(157) : see declaration of 'strerror'
+         server.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+         main.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>c:\users\lenka\desktop\pb173_ateam\main.cpp(151): warning C4101: 'port' : unreferenced local variable
+         client.cpp
+         _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+     1>c:\users\lenka\desktop\pb173_ateam\client.cpp(56): warning C4018: '<' : signed/unsigned mismatch
+         Generating Code...
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Lenka\Desktop\pb173_ateam\Debug\pb173_ateam.exe" /NOLOGO Ws2_32.lib /MANIFEST /ManifestFile:"Debug\pb173_ateam.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Lenka\Desktop\pb173_ateam\Debug\pb173_ateam.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Lenka\Desktop\pb173_ateam\Debug\pb173_ateam.lib" /MACHINE:X86 Debug\client.obj
+         Debug\main.obj
+         Debug\server.obj
+         Debug\socket.obj
+         Debug\struct.obj
+         pb173_ateam.vcxproj -> C:\Users\Lenka\Desktop\pb173_ateam\Debug\pb173_ateam.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Lenka\Desktop\pb173_ateam\Debug\pb173_ateam.exe;#1" /manifest Debug\pb173_ateam.exe.intermediate.manifest "c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\Include\Manifest\dpiaware.manifest"
+       FinalizeBuildStatus:
+         Deleting file "Debug\pb173_ateam.unsuccessfulbuild".
+         Touching "Debug\pb173_ateam.lastbuildstate".
+     1>Done Building Project "C:\Users\Lenka\Desktop\pb173_ateam\pb173_ateam.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:23.68
