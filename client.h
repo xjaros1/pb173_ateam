@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <string>
+#include <list>
 
 #include <afxwin.h>
-
+#include "aes.h"
 
 #include "socket.h"
 #include "struct.h"
@@ -26,7 +27,7 @@ public:
 	bool communication;
 	SocketClient* activePartnerSocket;
 private:
-	
+
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
 	unsigned char symKey[32];
@@ -38,7 +39,7 @@ private:
 	adress myAdress;
 	adress partnerAdress;
 	SocketClient* activeServerSocket;// premenna sluzi na to aby som mohls v lubovolnej metode ked uz som sa rraz na server nepojila mohla s nim komunikovat
-	
+
 	int port;
 	bool stop;
 public:
@@ -54,7 +55,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoSym(unsigned char key[32] , unsigned char iv[32] , unsigned char* data , unsigned char* outData  , int mode);
+	int cryptoSym(std::string, unsigned char[16], std::string, std::string&, int );
 
 	/**
 	* Encrypts/decrypts given data with RSA - 1024.
@@ -147,7 +148,7 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int certificateRequest(requestType rt , personInfo PI);
-	
+
 	/*int connectTo(std::string IP, int port);
 	int receiveData(char* buff, int len);
 	int endSocket();*/
