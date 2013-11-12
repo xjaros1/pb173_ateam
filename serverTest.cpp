@@ -1,4 +1,4 @@
-/*#include "server.h"
+#include "server.h"
 #include "minunit.h"
 #include <string>
 
@@ -10,17 +10,17 @@ extern int tests_run;
 using namespace std;
 
  static char* test_registration() {
-	 
+
 	 Server* server  = new Server();
 	 const string login1 = "Lenka";
 	 const string heslo1 = "Heslo1";
-	 const cert certifikat1 = cert();	 
+	 cert *certifikat1 = new cert();
 	 User* user1 = new User(login1,heslo1,certifikat1);
 
 	 //TEST correct registration
-	 mu_assert("problem in correct registration",server->registration(login1,heslo1,certifikat1));
+	 mu_assert("problem in correct registration",server->registration(login1,heslo1,certifikat1) == 0);
 	 User* found = server->getUser(login1);
-	 mu_assert("User is not found in the database",found==NULL);
+	 mu_assert("User is not found in the database",found!=NULL);
 	 mu_assert("Login is not the same",found->login==user1->login);
 	 mu_assert("Password is not the same",found->password==user1->password);
 	 mu_assert("Certificate is not the same",found->certificate==user1->certificate);
@@ -28,55 +28,57 @@ using namespace std;
 	 //TEST registration without password
 	 mu_assert("registration without password",server->registration("bez hesla","",certifikat1)!=0);
 	 //TEST registration without without certificate
-	 //mu_assert("registration without certificate",server->registration("bez certifikatu","heslo",NULL)!=0);
+	 mu_assert("registration without certificate",server->registration("bez certifikatu","heslo",NULL)!=0);
 	 //TEST registration without without login
 	 mu_assert("registration without login",server->registration("","heslo",certifikat1)!=0);
 	 //TEST
 	 mu_assert("double registration of same login",server->registration("Lenka","heslo",certifikat1)!=0);
 
-     
+	delete certifikat1;
+	delete user1;
  }
   static char* test_login()
   {
 	  Server* server = new Server();
-	  const cert certifikat1 = cert();
+	  cert *certifikat1 = new cert();
 	  //TEST prihlasit zaregistrovaneho uzivatela
 	  server->registration("Lenka","heslo",certifikat1);
 	  server->registration("Zuzka","heslo",certifikat1);
-	  mu_assert("login return non zero value",server->login("Lenka","heslo"));
+	  mu_assert("login return non zero value",server->login("Lenka","heslo", 100)==0);
 	  User* found = server->getOnlineUser("Lenka");
 	  mu_assert("User is not found in the database",found!=NULL);
 	  mu_assert("Login is not the same",found->login=="Lenka");
 	  mu_assert("Password is not the same",found->password=="heslo");
 	  mu_assert("Certificate is not the same",found->certificate==certifikat1);
 
-	  //TEST pokus o login neregistrovaneho	  
-	  mu_assert("login of unregistered user passed",server->login("neregistrovany","heslo")!=0);
+	  //TEST pokus o login neregistrovaneho
+	  mu_assert("login of unregistered user passed",server->login("neregistrovany","heslo", 100)!=0);
 	  found = server->getOnlineUser("neregistrovany");
 	  mu_assert("unregistered user is found in database of online users",found==NULL);
 
 	  //TEST prihlasenie s nespravnym heslom
-	  mu_assert("login with wrong password",server->login("Zuzka","nespravne"));
+	  mu_assert("login with wrong password",server->login("Zuzka","nespravne", 100)!=0);
 	  found = server->getOnlineUser("Zuzka");
 	  mu_assert("after wrong password the user is found in list of online",found==NULL);
 
 	  //TEST prihlasenie bez hesla
-	  mu_assert("login without password",server->login("Zuzka",""));
+	  mu_assert("login without password",server->login("Zuzka","", 100)!=0);
 	  found = server->getOnlineUser("Zuzka");
 	  mu_assert("after login without password the user is found in list of online",found==NULL);
 
 	  //TEST login without username
-	  mu_assert("login without username",server->login("","heslo"));
-
+	  mu_assert("login without username",server->login("","heslo", 100)!=0);
+	  delete server;
+	  delete certifikat1;
   }
 
   static char* test_logout()
   {
 	  Server* server = new Server();
-	  const cert certifikat1 = cert();
+	  cert *certifikat1 = new cert();
 	  server->registration("Lenka","heslo",certifikat1);
 	  //TEST korektne odhlasenie
-	  server->login("Lenka","heslo");
+	  server->login("Lenka","heslo", 100);
 	  mu_assert("correct logout didn't passed",server->logout("Lenka")==0);
 	  User* found = server->getOnlineUser("Lenka");
 	  mu_assert("user wasn't logout",found==NULL);
@@ -86,7 +88,8 @@ using namespace std;
 
 	  //TEST odhlasenie offline uzivatela
 	  mu_assert("logout of offline user passed without error",server->logout("Lenka")!=0);
-	  
+	  delete server;
+	  delete certifikat1;
   }
 
 

@@ -8,7 +8,7 @@
 
 
 Server::Server(){
-	
+
 }
 
 
@@ -21,17 +21,20 @@ string Server::generatePassword()//toto raz bude geneerovat anhodne hesla.. zati
 }
 
 //odpoved na jednotlive klientske requesty toto konkretne o registraciu. tato a jej podobne funkcie su volane zo statickej metody answer ktoru najdes v maine
-int Server::registration(std::string login , std::string pwd , cert* userCert) 
+int Server::registration(std::string login , std::string pwd , cert* userCert)
 {
 	cout <<"Klient "<<login<<" sa pokusa zaregistrovat\n";
 	if (getUser(login)!=NULL) {cout<< "Neuspesne, taky login uz je zaregistrovany\n"; return 1;}
+	if(pwd.empty()) { cout<<"Bez hesla" << std::endl; return 1;}
+	if(userCert == NULL) {cout <<"bez certifikatu"<<endl; return 1;}
+	if(login.empty()) {cout <<"Bez loginu" << endl; return 1;}
 	registeredUsers.push_back(new User(login,pwd,userCert));
 	cout << "Registracia prebehla uspesne\n";
 	return 0;
 }
 
 // pomocne metody notner aby sa dalo rozumne pracovat podla loginu vratia usera
-User* Server::getUser(std::string login) 
+User* Server::getUser(std::string login)
 {
 	if (registeredUsers.empty()) return NULL;
 	list<User*>::iterator iter;
@@ -53,7 +56,7 @@ User* Server::getOnlineUser(std::string login)
 }
 
  // dalsia obsluzna metoda
-int Server::login(std::string login,std::string password, int port) 
+int Server::login(std::string login,std::string password, int port)
 {
 	cout << "uzivatel " <<login <<" sa pokusa prihlasit\n";
 	User* u = getOnlineUser(login);
@@ -106,7 +109,7 @@ int Server::startClientCommunication(std::string fromC, std::string toC)
 		std::cout<<"Pripojenie neuspesne\n";
 		partnerClientSocket = NULL;
 	}
-	
+
 	return 0;
 }
 
@@ -117,14 +120,14 @@ int Server::logout(std::string login){
 	u = getOnlineUser(login);
 	if (!u) {cout << "User is already disconnected.\n";return -1;}
 
-	
+
 	for(std::list<User*>::iterator i = onlineUsers.begin(); i != onlineUsers.end() ; i++){
 		if((*i) == u){
-			delete *i;
+			//delete *i;
 			i = onlineUsers.erase(i);
 
 			if(i == onlineUsers.end()){
-				break;	
+				break;
 			}
 		}
 	}
