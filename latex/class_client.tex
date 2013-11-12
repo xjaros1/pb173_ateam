@@ -1,0 +1,249 @@
+\hypertarget{class_client}{\section{Client Class Reference}
+\label{class_client}\index{Client@{Client}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{class_client_ac152cb465f5524a7bd38090c1f57089b}{crypto\-Sym} (unsigned char key\mbox{[}32\mbox{]}, unsigned char iv\mbox{[}32\mbox{]}, unsigned char $\ast$data, unsigned char $\ast$out\-Data, int mode)
+\item 
+int \hyperlink{class_client_ac20bb1b1e5c21bdb58c45c6474bcae9b}{crypto\-Asym} (unsigned char key\mbox{[}128\mbox{]}, unsigned char $\ast$data, unsigned char $\ast$out\-Data, int mode)
+\item 
+int \hyperlink{class_client_a4acc927594f9e12a5ae9147c335f1ae2}{send\-Data} (\hyperlink{structadress}{adress} partner\-Adress, unsigned char $\ast$data)
+\item 
+int \hyperlink{class_client_ad0dbe29b7e5d19ca06f45730c08ca051}{rand\-Gen\-A\-E\-S} (unsigned char $\ast$key)
+\item 
+int \hyperlink{class_client_a0c8a7fcdcea7013878578fd840eef464}{rand\-Gen\-R\-S\-A} (unsigned char $\ast$public\-Key, unsigned char $\ast$private\-Key)
+\item 
+int \hyperlink{class_client_a60cfdb762ec279a63274e3a46430ac9c}{login\-Request} (request\-Type r\-T, unsigned char $\ast$login, unsigned char $\ast$password)
+\item 
+int \hyperlink{class_client_a5a76ae37a411c76b2ce2e8cc4fc8fbd9}{logout\-Request} (request\-Type r\-T, unsigned char $\ast$login)
+\item 
+int \hyperlink{class_client_aff7805d64cf3c1ee8f76eced3128e88b}{registration\-Request} (request\-Type r\-T, \hyperlink{structcert}{cert} my\-Cert)
+\item 
+int \hyperlink{class_client_a2bfb998ce32f3e80afb12b6cfe7720b2}{adress\-Request} (request\-Type rt, unsigned char $\ast$partner\-Login)
+\item 
+int \hyperlink{class_client_a5c39a43e0d8020dba7bfcdb90850175b}{certificate\-Request} (request\-Type rt, \hyperlink{structperson_info}{person\-Info} P\-I)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_client_a2bfb998ce32f3e80afb12b6cfe7720b2}{\index{Client@{Client}!adress\-Request@{adress\-Request}}
+\index{adress\-Request@{adress\-Request}!Client@{Client}}
+\subsubsection[{adress\-Request}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::adress\-Request (
+\begin{DoxyParamCaption}
+\item[{request\-Type}]{rt, }
+\item[{unsigned char $\ast$}]{partner\-Login}
+\end{DoxyParamCaption}
+)}}\label{class_client_a2bfb998ce32f3e80afb12b6cfe7720b2}
+Requests partner's adress from server, based on partner's login.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request\-Type} & type of request \\
+\hline
+{\em partner\-Login} & partner's login\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_a5c39a43e0d8020dba7bfcdb90850175b}{\index{Client@{Client}!certificate\-Request@{certificate\-Request}}
+\index{certificate\-Request@{certificate\-Request}!Client@{Client}}
+\subsubsection[{certificate\-Request}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::certificate\-Request (
+\begin{DoxyParamCaption}
+\item[{request\-Type}]{rt, }
+\item[{{\bf person\-Info}}]{P\-I}
+\end{DoxyParamCaption}
+)}}\label{class_client_a5c39a43e0d8020dba7bfcdb90850175b}
+Request signed certificate from C\-A.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request\-Type} & type of request \\
+\hline
+{\em P\-I} & user's personal info\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_ac20bb1b1e5c21bdb58c45c6474bcae9b}{\index{Client@{Client}!crypto\-Asym@{crypto\-Asym}}
+\index{crypto\-Asym@{crypto\-Asym}!Client@{Client}}
+\subsubsection[{crypto\-Asym}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::crypto\-Asym (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{key\mbox{[}128\mbox{]}, }
+\item[{unsigned char $\ast$}]{data, }
+\item[{unsigned char $\ast$}]{out\-Data, }
+\item[{int}]{mode}
+\end{DoxyParamCaption}
+)}}\label{class_client_ac20bb1b1e5c21bdb58c45c6474bcae9b}
+Encrypts/decrypts given data with R\-S\-A -\/ 1024.
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & 1024 bit long key \\
+\hline
+{\em data} & input data \\
+\hline
+{\em out\-Data} & output data \\
+\hline
+{\em mode} & 0 -\/ encryption ; 1 -\/ decryption\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_ac152cb465f5524a7bd38090c1f57089b}{\index{Client@{Client}!crypto\-Sym@{crypto\-Sym}}
+\index{crypto\-Sym@{crypto\-Sym}!Client@{Client}}
+\subsubsection[{crypto\-Sym}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::crypto\-Sym (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{key\mbox{[}32\mbox{]}, }
+\item[{unsigned char}]{iv\mbox{[}32\mbox{]}, }
+\item[{unsigned char $\ast$}]{data, }
+\item[{unsigned char $\ast$}]{out\-Data, }
+\item[{int}]{mode}
+\end{DoxyParamCaption}
+)}}\label{class_client_ac152cb465f5524a7bd38090c1f57089b}
+Encrypts/decrypts given data with A\-E\-S -\/ 128.
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & 128 bit long key \\
+\hline
+{\em iv} & initialisation vector \\
+\hline
+{\em data} & input data \\
+\hline
+{\em out\-Data} & output data \\
+\hline
+{\em mode} & 0 -\/ encryption ; 1 -\/ decryption\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_a60cfdb762ec279a63274e3a46430ac9c}{\index{Client@{Client}!login\-Request@{login\-Request}}
+\index{login\-Request@{login\-Request}!Client@{Client}}
+\subsubsection[{login\-Request}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::login\-Request (
+\begin{DoxyParamCaption}
+\item[{request\-Type}]{r\-T, }
+\item[{unsigned char $\ast$}]{login, }
+\item[{unsigned char $\ast$}]{password}
+\end{DoxyParamCaption}
+)}}\label{class_client_a60cfdb762ec279a63274e3a46430ac9c}
+Requests login to server.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request\-Type} & type of request \\
+\hline
+{\em login} & user's login \\
+\hline
+{\em password} & user's password\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_a5a76ae37a411c76b2ce2e8cc4fc8fbd9}{\index{Client@{Client}!logout\-Request@{logout\-Request}}
+\index{logout\-Request@{logout\-Request}!Client@{Client}}
+\subsubsection[{logout\-Request}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::logout\-Request (
+\begin{DoxyParamCaption}
+\item[{request\-Type}]{r\-T, }
+\item[{unsigned char $\ast$}]{login}
+\end{DoxyParamCaption}
+)}}\label{class_client_a5a76ae37a411c76b2ce2e8cc4fc8fbd9}
+Requests logout from server.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request\-Type} & type of request \\
+\hline
+{\em login} & user's login\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_ad0dbe29b7e5d19ca06f45730c08ca051}{\index{Client@{Client}!rand\-Gen\-A\-E\-S@{rand\-Gen\-A\-E\-S}}
+\index{rand\-Gen\-A\-E\-S@{rand\-Gen\-A\-E\-S}!Client@{Client}}
+\subsubsection[{rand\-Gen\-A\-E\-S}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::rand\-Gen\-A\-E\-S (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{key}
+\end{DoxyParamCaption}
+)}}\label{class_client_ad0dbe29b7e5d19ca06f45730c08ca051}
+Generates random A\-E\-S key.
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & generated key\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_a0c8a7fcdcea7013878578fd840eef464}{\index{Client@{Client}!rand\-Gen\-R\-S\-A@{rand\-Gen\-R\-S\-A}}
+\index{rand\-Gen\-R\-S\-A@{rand\-Gen\-R\-S\-A}!Client@{Client}}
+\subsubsection[{rand\-Gen\-R\-S\-A}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::rand\-Gen\-R\-S\-A (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{public\-Key, }
+\item[{unsigned char $\ast$}]{private\-Key}
+\end{DoxyParamCaption}
+)}}\label{class_client_a0c8a7fcdcea7013878578fd840eef464}
+Generates random pair of R\-S\-A keys.
+
+
+\begin{DoxyParams}{Parameters}
+{\em public\-Key} & generated public key \\
+\hline
+{\em private\-Key} & generated private key\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_aff7805d64cf3c1ee8f76eced3128e88b}{\index{Client@{Client}!registration\-Request@{registration\-Request}}
+\index{registration\-Request@{registration\-Request}!Client@{Client}}
+\subsubsection[{registration\-Request}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::registration\-Request (
+\begin{DoxyParamCaption}
+\item[{request\-Type}]{r\-T, }
+\item[{{\bf cert}}]{my\-Cert}
+\end{DoxyParamCaption}
+)}}\label{class_client_aff7805d64cf3c1ee8f76eced3128e88b}
+Requests registration on server.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request\-Type} & type of request \\
+\hline
+{\em my\-Cert} & user's certificate\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+\hypertarget{class_client_a4acc927594f9e12a5ae9147c335f1ae2}{\index{Client@{Client}!send\-Data@{send\-Data}}
+\index{send\-Data@{send\-Data}!Client@{Client}}
+\subsubsection[{send\-Data}]{\setlength{\rightskip}{0pt plus 5cm}int Client\-::send\-Data (
+\begin{DoxyParamCaption}
+\item[{{\bf adress}}]{partner\-Adress, }
+\item[{unsigned char $\ast$}]{data}
+\end{DoxyParamCaption}
+)}}\label{class_client_a4acc927594f9e12a5ae9147c335f1ae2}
+Sends data to other client.
+
+
+\begin{DoxyParams}{Parameters}
+{\em partner\-Adress} & other client's adress \\
+\hline
+{\em data} & data to be send\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns zero when succesful, nonzero value otherwise 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+client.\-h\end{DoxyCompactItemize}

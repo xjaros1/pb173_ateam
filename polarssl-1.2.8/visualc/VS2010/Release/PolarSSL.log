@@ -1,0 +1,99 @@
+﻿Build started 30. 9. 2013 19:41:40.
+     1>Project "C:\Users\Lubo\Documents\Visual Studio 2010\Projects\polarssl-1.2.8\visualc\VS2010\PolarSSL.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Release\PolarSSL.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D POLARSSL_EXPORTS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt ..\..\library\aes.c ..\..\library\arc4.c ..\..\library\asn1parse.c ..\..\library\base64.c ..\..\library\bignum.c ..\..\library\blowfish.c ..\..\library\camellia.c ..\..\library\certs.c ..\..\library\cipher.c ..\..\library\cipher_wrap.c ..\..\library\ctr_drbg.c ..\..\library\debug.c ..\..\library\des.c ..\..\library\dhm.c ..\..\library\entropy.c ..\..\library\entropy_poll.c ..\..\library\error.c ..\..\library\gcm.c ..\..\library\havege.c ..\..\library\md.c ..\..\library\md2.c ..\..\library\md4.c ..\..\library\md5.c ..\..\library\md_wrap.c ..\..\library\net.c ..\..\library\padlock.c ..\..\library\pem.c ..\..\library\pkcs11.c ..\..\library\rsa.c ..\..\library\sha1.c ..\..\library\sha2.c ..\..\library\sha4.c ..\..\library\ssl_cache.c ..\..\library\ssl_cli.c ..\..\library\ssl_srv.c ..\..\library\ssl_tls.c ..\..\library\timing.c ..\..\library\version.c ..\..\library\x509parse.c ..\..\library\xtea.c
+         aes.c
+         arc4.c
+         asn1parse.c
+         base64.c
+         bignum.c
+         blowfish.c
+         camellia.c
+         certs.c
+         cipher.c
+         cipher_wrap.c
+         ctr_drbg.c
+         debug.c
+         des.c
+         dhm.c
+         entropy.c
+         entropy_poll.c
+         error.c
+         gcm.c
+         havege.c
+         md.c
+         Compiling...
+         md2.c
+         md4.c
+         md5.c
+         md_wrap.c
+         net.c
+         padlock.c
+         pem.c
+         pkcs11.c
+         rsa.c
+         sha1.c
+         sha2.c
+         sha4.c
+         ssl_cache.c
+         ssl_cli.c
+         ssl_srv.c
+         ssl_tls.c
+     1>..\..\library\ssl_tls.c(3928): warning C4090: 'function' : different 'const' qualifiers
+         timing.c
+         version.c
+         x509parse.c
+     1>..\..\library\x509parse.c(1937): warning C4102: 'cleanup' : unreferenced label
+         xtea.c
+       Lib:
+         D:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"C:\Users\Lubo\Documents\Visual Studio 2010\Projects\polarssl-1.2.8\visualc\VS2010\Release\PolarSSL.lib" /NOLOGO /LTCG Release\aes.obj
+         Release\arc4.obj
+         Release\asn1parse.obj
+         Release\base64.obj
+         Release\bignum.obj
+         Release\blowfish.obj
+         Release\camellia.obj
+         Release\certs.obj
+         Release\cipher.obj
+         Release\cipher_wrap.obj
+         Release\ctr_drbg.obj
+         Release\debug.obj
+         Release\des.obj
+         Release\dhm.obj
+         Release\entropy.obj
+         Release\entropy_poll.obj
+         Release\error.obj
+         Release\gcm.obj
+         Release\havege.obj
+         Release\md.obj
+         Release\md2.obj
+         Release\md4.obj
+         Release\md5.obj
+         Release\md_wrap.obj
+         Release\net.obj
+         Release\padlock.obj
+         Release\pem.obj
+         Release\pkcs11.obj
+         Release\rsa.obj
+         Release\sha1.obj
+         Release\sha2.obj
+         Release\sha4.obj
+         Release\ssl_cache.obj
+         Release\ssl_cli.obj
+         Release\ssl_srv.obj
+         Release\ssl_tls.obj
+         Release\timing.obj
+         Release\version.obj
+         Release\x509parse.obj
+         Release\xtea.obj
+         PolarSSL.vcxproj -> C:\Users\Lubo\Documents\Visual Studio 2010\Projects\polarssl-1.2.8\visualc\VS2010\Release\PolarSSL.lib
+       FinalizeBuildStatus:
+         Deleting file "Release\PolarSSL.unsuccessfulbuild".
+         Touching "Release\PolarSSL.lastbuildstate".
+     1>Done Building Project "C:\Users\Lubo\Documents\Visual Studio 2010\Projects\polarssl-1.2.8\visualc\VS2010\PolarSSL.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:06.10
