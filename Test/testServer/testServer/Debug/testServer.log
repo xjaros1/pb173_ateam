@@ -1,4 +1,0 @@
-﻿  testServer.cpp
-d:\users\martin\desktop\test\testserver\testserver\testserver.cpp(285): warning C4715: 'Server::find' : not all control paths return a value
-d:\users\martin\desktop\test\testserver\testserver\testserver.cpp(367): warning C4715: 'Server::startServer' : not all control paths return a value
-  testServer.vcxproj -> D:\Users\Martin\Desktop\Test\testServer\Debug\testServer.exe
