@@ -22,7 +22,49 @@
 
 Server* myServer;//globalne premenne ktore som pouzila kvoli tomu ze vlaknova funkcia ma byt staticka
 Client* myClient;
-
+unsigned int pre_generatingKeyEnc(void* s)
+{
+	unsigned char key[16] = {212,212,212,212,212,212,212,212,212,212,212,212,212,212,212,212};
+	Client* k = (Client*) s;
+	k->counterEnc = 0;
+	k->counterDec = 0;
+	k->getPointerEnc = 0;
+	k->putPointerEnc = 0;
+	k->getPointerDec = 0;
+	k->putPointerDec = 0;
+	unsigned char  input[16];
+	aes_context ctx;
+	while(true)
+	{
+		if(((k->putPointerEnc>k->getPointerEnc) &&  ((k->putPointerEnc +16)>1000) && (((k->putPointerEnc +16)%1000)>k->getPointerEnc)) || ((k->putPointerEnc<k->getPointerEnc)&&((k->putPointerEnc + 16)>k->getPointerEnc)) || k->putPointerEnc == k->getPointerEnc)
+	{
+		for(int i = 15;i>=0;i--)
+		{
+			int x = k->counterEnc;
+			input[i] = x%256;
+			x = x/256;
+		}
+		aes_setkey_enc(&ctx, key, 128);
+		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,k->encBuffer+k->putPointerEnc);
+		k->counterEnc++;
+		k->putPointerEnc++;
+	}
+		if(((k->putPointerDec>k->getPointerDec) &&  ((k->putPointerDec +16)>1000) && (((k->putPointerDec +16)%1000)>k->getPointerDec)) || ((k->putPointerDec<k->getPointerDec)&&((k->putPointerDec + 16)>k->getPointerDec)) || k->putPointerDec == k->getPointerDec)
+	{
+		for(int i = 15;i>=0;i--)
+		{
+			int x = k->counterDec;
+			input[i] = x%256;
+			x = x/256;
+		}
+		aes_setkey_enc(&ctx, key, 128);
+		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,k->decBuffer+k->putPointerDec);
+		k->counterDec++;
+		k->putPointerDec++;
+	}
+	}
+	return 0;
+}
 int commandParse(std::string& value , std::string cmd){
 	std::vector<string> command = split(cmd , ":");
 	if(command.size() > 1)
@@ -39,7 +81,6 @@ int commandParse(std::string& value , std::string cmd){
 	if(command[0].compare("/end") == 0){return 7;}
 	if(command[0].compare("/disconnect") == 0){return 8;}
 	if(command[0].compare("/quit") == 0){return 9;}
-	if(command[0].compare("/sendJunk") == 0){return 10;}
 	
 	std::cout<<"Unknown command.\n";
 	return -1;
@@ -51,35 +92,55 @@ UINT output(LPVOID s){
 	std::string r;
 	while(1){
 		r = server->ReceiveLine();
+		bool understand = false;
+		
 		Sleep(100);
-		r = r.substr(0,r.size()-1);
+		//r = r.substr(0,r.size()-1);
 		vector<string> message = split(r,":");
+		message[message.size()-1] = message[message.size()-1].substr(0,message[message.size()-1].size()-1);
 
 		if(message[0].compare("COMM") == 0){
 			cout << "User "<<message[1]<<" wants to establish a communication. Accept or decline him.\n";
 			myClient->incomingConnection = true;
 			myClient->activePartnerSocket = new SocketClient("127.0.0.1" , atoi(message[2].c_str()));
 			myClient->partnerName = message[1];
+			understand = true;
 			break;
 		}
+		
 		if(message[0].compare("YES") == 0){
 			std::cout<<"Connection accepted.\n";
-			myClient->activePartnerSocket = new SocketClient("127.0.0.1" , atoi(message[1].c_str()));
+			myClient->activePartnerSocket = new SocketClient("127.0.0.1" , atoi(message[1].c_str()));			
+			understand = true;
 		}
 		if(message[0].compare("NO") == 0){
 			std::cout<<"Connection declined.\n";
 			myClient->partnerName.clear();
+			understand = true;
 			break;
 		}
 		if(message[0].compare("END") == 0){
 			std::cout<<"Connection terminated on partner's side.\n";
 			delete myClient->activePartnerSocket;
 			myClient->activePartnerSocket = NULL;
+			understand = true;
 			break;
 		}
 		if(message[0].compare("MESS") == 0){
 			cout<<myClient->partnerName<<" says: "<<message[1]<<std::endl;
+			understand = true;
 		}
+		if (!understand)
+		{
+			r = myClient->decipher(r);//moje
+			//r = r.substr(0,r.size()-1);//moje
+			message = split(r,":");//moje
+			if(message[0].compare("MESS") == 0){
+				message[1] = message[1].substr(0,message[1].size()-1);
+				cout<<myClient->partnerName<<" says: "<<message[1]<<std::endl;
+			}
+		}
+		
 	}
 	return 0;
 }
@@ -200,6 +261,29 @@ UINT waiting(LPVOID a){//toto caka na spojenie
 >>>>>>>>>>>>>>>>>>>>>>>MAIN<<<<<<<<<<<<<<<<<<<<<<
 *************************************************/
 int main(int argc , char** argv){
+	/*unsigned int port = 0;
+	std::string tmp = argv[1];
+	if(tmp.compare("server") == 0){
+		std::cout<<"Running as a server."<<std::endl;		
+		myServer = new Server();
+		starting(SERVER_DEFAULT_PORT);
+		std::cout<<"Server started.\n";
+		while(1){}
+		delete myServer;
+	}
+	else{	
+	Client* c = new Client("lenka");
+	CWinThread* crypt = new CWinThread();
+	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c);
+	Client* c1 = new Client("Janko");
+	CWinThread* crypt1 = new CWinThread();
+	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c1);
+	string	pokus = c->encipher("ahoj");
+	cout << pokus;
+	pokus = c1->encipher(pokus);
+	cout << pokus;
+	cin.get();
+	}*/
 	if(argc != 2){
 		std::cerr<<"[ERROR] Bad argument."<<std::endl;
 		return 1;
@@ -222,7 +306,6 @@ int main(int argc , char** argv){
 		std::cout<<"Running as client\n";
 		std::cout<<"Specify your login: ";
 		std::string login;
-		//std::getline(std::cin , login);
 		cin>>login;
 		std::cout<<"For a list of commands type \"/help\"\n";
 		myClient = new Client(login);
@@ -310,21 +393,12 @@ int main(int argc , char** argv){
 					}
 					quit = true;
 					break;
-				case 10://sendJunk
-					int intValue = 0;
-					std::stringstream ss;
-					ss<<value;
-					ss>>intValue;
-					for(int i = 0 ; i < intValue ; i++){
-						buff<<i;
-					}
-					myClient->activePartnerSocket->SendLine(buff.str());
-					break;
 				}
 			}else{
 				if(myClient->activePartnerSocket){
 					std::string mess = "MESS:";
 					mess = mess + cmd;
+					//mess = myClient->encipher(mess); //MOJE//uplne dobre to nefunguje(lubo)
 					myClient->activePartnerSocket->SendLine(mess);
 				}else{
 					std::cout<<"  Message not sent(no recipient connected)\n";

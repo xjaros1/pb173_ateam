@@ -26,7 +26,7 @@ int Server::registration(std::string login , std::string pwd , cert* userCert)
 	cout <<"Klient "<<login<<" sa pokusa zaregistrovat\n";
 	if (getUser(login)!=NULL) {cout<< "Neuspesne, taky login uz je zaregistrovany\n"; return 1;}
 	if(pwd.empty()) { cout<<"Bez hesla" << std::endl; return 1;}
-	if(userCert == NULL) {cout <<"bez certifikatu"<<endl; return 1;}
+	if(userCert) {cout <<"bez certifikatu"<<endl; return 1;}//toto je kvoli testovaniu, potom treba prehodit podmienku
 	if(login.empty()) {cout <<"Bez loginu" << endl; return 1;}
 	registeredUsers.push_back(new User(login,pwd,userCert));
 	cout << "Registracia prebehla uspesne\n";

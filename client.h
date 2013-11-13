@@ -28,6 +28,14 @@ public:
 	std::string partnerName;
 	int port;
 	bool incomingConnection;
+	unsigned char encBuffer[1000];
+	unsigned char decBuffer[1000];
+	int getPointerEnc;
+	int putPointerEnc;
+	int counterEnc;
+	int getPointerDec;
+	int putPointerDec;
+	int counterDec;
 private:
 	
 	unsigned char publicKey[128];
@@ -157,6 +165,8 @@ public:
 	int communicationRequest(std::string);
 	int logoutRequest();
 //static	UINT clientWaiting(LPVOID a);
+	std::string encipher(std::string text);
+	std::string decipher(std::string text);
 };
 
 

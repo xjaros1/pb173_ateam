@@ -1,9 +1,8 @@
 #include <iostream>
-#include <sstream>
 #include "client.h"
 #include "minunit.h"
 
-/*extern int tests_run;
+extern int tests_run;
 unsigned char TestCrypto::keySym[32] = "0123456789abcdef";
 unsigned char TestCrypto::iv[32] = {0};
 unsigned char TestCrypto::data[20] = "test crypto";
@@ -61,66 +60,30 @@ public:
 		mu_run_test(test_generRSA);
 		return 0;
 	}
-};*/
-
+};
 class TestLogin{
 public:
-	static char* test_registrationRequest(){
-		Client* testClient = new Client("Lubo");
-		int conf = testClient->registrationRequest();
-		mu_assert("Error login request", conf == 0);
-	}
-
+	static Client cl;
+	static unsigned char* login;
 	static char* test_loginRequest(){
-		bool success = false;
-		Client* testClient = new Client("Lubo");
-		testClient->registrationRequest();
-		testClient->loginRequest("heslo");
 
-		std::stringstream buff;
-		buff<<"LIST:Lubo";
-		testClient->activeServerSocket->SendLine(buff.str());
-		Sleep(100);
-		std::string r = testClient->activeServerSocket->ReceiveLine();
-		r = r.substr(0,r.size()-1);
-		vector<string> message = split(r,":");
-
-		for(int i =0;i<message.size();i++)
-		{
-			if(message[i].compare("Lubo") == 0){success=true;}
-		}
-		mu_assert("Error login request", success);
+		unsigned char* password = (unsigned char*)"POKUS";
+		strcpy( (char*) login, "Martin");
+		mu_assert("Error login request", cl.loginRequest(requestType::LOGIN, login, password) == 0);
+		return 0;
 	}
-
 	static char* test_logoutRequest(){
-		bool success = true;
-		Client* myClient = new Client("Lubo");
-		myClient->registrationRequest();
-		myClient->loginRequest("heslo");
-		myClient->logoutRequest();
 
-		Client* testClient = new Client("Dakto");
-		testClient->registrationRequest();
-		testClient->loginRequest("heslo");
-
-		std::stringstream buff;
-		buff<<"LIST:Dakto";
-		testClient->activeServerSocket->SendLine(buff.str());
-		Sleep(100);
-		std::string r = testClient->activeServerSocket->ReceiveLine();
-		r = r.substr(0,r.size()-1);
-		vector<string> message = split(r,":");
-
-		for(int i =0;i<message.size();i++)
-		{
-			if(message[i].compare("Lubo") == 0){success=false;}
-		}
-		mu_assert("Error logout request", success);
-
+		strcpy( (char*) login, "Martin");
+		mu_assert("Error logout request", cl.logoutRequest(requestType::LOGOUT, login) == 0);
+		return 0;
 	}
-
-	/*static char* test_adressRequest(){
-
+	static char* test_registrationRequest(){
+		cert myCert = cert();
+		mu_assert("Error registration request", cl.registrationRequest(requestType::REG, myCert) ==0 );
+		return 0;
+	}
+	static char* test_adressRequest(){
 		unsigned char* partnerLogin = (unsigned char*) "Lenka";
 		mu_assert("Error adress request", cl.adressRequest(requestType::ADRESS, partnerLogin) == 0);
 		return 0;
@@ -129,14 +92,21 @@ public:
 		personInfo PI = personInfo();
 		mu_assert("Error cert request", cl.certificateRequest(requestType::CA, PI) == 0);
 		return 0;
-	}*/
+	}
+	static char* test_sendData(){
 
-	static char* all_tests(){
+		adress partnerAdress = adress();
+		unsigned char* data = (unsigned char*) "SENDING DATA";
+		mu_assert("Error send data", cl.sendData(partnerAdress, data));
+		return 0;
+	}
+	static char* all_run_test(){
 		mu_run_test(test_loginRequest);
 		mu_run_test(test_logoutRequest);
 		mu_run_test(test_registrationRequest);
-		//mu_run_test(test_adressRequest);
-		//mu_run_test(test_certRequest);
+		mu_run_test(test_adressRequest);
+		mu_run_test(test_certRequest);
+		mu_run_test(test_sendData);
 		return 0;
 	}
 

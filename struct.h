@@ -28,6 +28,7 @@ unsigned int waiting(void* a);
 unsigned int answer(void* s);
 void starting(int port);
 unsigned int clientWaiting(void* a);
+unsigned int pre_generatingKeyEnc(void* s);
 
 
 //vector<string> mySplit(string line,char separator) {

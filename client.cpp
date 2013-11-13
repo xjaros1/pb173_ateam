@@ -4,6 +4,8 @@
 #include <sstream>
 
 Client::Client(string login){// klient sa pokusa spojit so serverom hned ako sa vytvori
+	CWinThread* crypt = new CWinThread();
+	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) this);
 	this->login = login;
 	stop = false;
 	incomingConnection = false;
@@ -162,4 +164,43 @@ int Client::cryptoSym(std::string key, unsigned char iv[16], std::string data, s
 	outData = std::string((char*) out, length);
 	strcpy((char*) iv, strIv.c_str());
 	return true;
+}
+
+
+
+string Client::encipher(string text)
+{
+	string cipherText;
+	cipherText.resize(text.size());
+	int i = 0;
+	bool done = false;
+	while(!done)
+	{
+		while (this->getPointerEnc != this->putPointerEnc)
+		{
+			if (i == text.size()) {done = true;break;}
+			cipherText[i] = text[i] ^ this->encBuffer[getPointerEnc];
+			i++;
+			getPointerEnc++;
+		}
+	}
+	return cipherText;
+}
+string Client::decipher(string text)
+{
+	string plainText;
+	plainText.resize(text.size());
+	int i = 0;
+	bool done = false;
+	while(!done)
+	{
+		while (this->getPointerDec != this->putPointerDec)
+		{
+			if (i == text.size()) {done = true;break;}
+			plainText[i] = text[i] ^ this->decBuffer[getPointerDec];
+			i++;
+			getPointerDec++;
+		}
+	}
+	return plainText;
 }
