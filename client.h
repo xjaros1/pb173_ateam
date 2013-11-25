@@ -161,9 +161,25 @@ public:
 	/*int connectTo(std::string IP, int port);
 	int receiveData(char* buff, int len);
 	int endSocket();*/
+
+	/*
+	* Metody pre obsluhu prikazov uzivatela(Lubo)
+	*/
+private:
+	int commandParse(std::string& , std::string);
 	int listRequest();
 	int communicationRequest(std::string);
 	int logoutRequest();
+	int connectToPartner(std::string value);
+	int acceptComm();
+	int declineComm();
+	int endComm();
+	int disconnect();
+	int quit();
+	void help();
+public:
+	int command(std::string);
+	int sendMessage(std::string);
 //static	UINT clientWaiting(LPVOID a);
 	std::string encipher(std::string text);
 	std::string decipher(std::string text);

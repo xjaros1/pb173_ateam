@@ -112,15 +112,7 @@ int Client::communicationRequest(string partnerLogin)
 	else cout << "An error occured, communication won't be established.\n";
 	return 0;
 }
-/*int Client::sendData(int port)
-{
-	cout << "Trying to establish connection on port "<<port<<endl;
-	activePartnerSocket = new SocketClient("127.0.0.1" , port);
-	stringstream toSend;
-	toSend<<"YES";
-	activePartnerSocket->SendLine(toSend.str());
-	return 0;
-}*/
+
 
 int Client::logoutRequest(){
 	std::stringstream buff;
@@ -203,4 +195,165 @@ string Client::decipher(string text)
 		}
 	}
 	return plainText;
+}
+
+int Client::connectToPartner(std::string value){
+	if(!activePartnerSocket){
+		partnerName = value;
+		communicationRequest(value);
+		return 0;
+	}else{
+		std::cout<<"  You already have ongoing communication.\n";
+		return -1;
+	}
+}
+
+int Client::acceptComm(){
+	if(incomingConnection){
+		std::stringstream buff;
+		buff<<"YES:"<<port;
+		Sleep(100);
+		activePartnerSocket->SendLine(buff.str());
+		std::cout<<"You are now connected to "<<partnerName<<std::endl;
+		return 0;
+	}else{
+		std::cout<<"  You have currently no incoming connections.\n";
+		return -1;
+	}
+}
+
+int Client::declineComm(){
+	if(incomingConnection){
+		std::string buff;
+		buff = "NO";
+		activePartnerSocket->SendLine(buff);
+		delete activePartnerSocket;
+		activePartnerSocket = NULL;
+		return 0;
+	}else{
+		std::cout<<"  You have currently no incoming connections.\n";
+		return -1;
+	}
+}
+
+int Client::endComm(){
+	if(activePartnerSocket){
+		std::string buff;
+		buff = "END";
+		activePartnerSocket->SendLine(buff);
+		delete activePartnerSocket;
+		activePartnerSocket = NULL;
+		return 0;
+	}else{
+		std::cout<<"  You have currently no ongoing communication.\n";
+		return -1;
+	}
+}
+
+int Client::disconnect(){
+	if(activeServerSocket){
+		logoutRequest();
+		return 0;
+	}else{
+		std::cout<<"  You are not connected at this moment.\n";
+		return -1;
+	}
+}
+
+int Client::quit(){
+	if(activePartnerSocket){
+		std::string buff;
+		buff = "END";
+		activePartnerSocket->SendLine(buff);
+		delete activePartnerSocket;
+	}
+	if(activeServerSocket){
+		logoutRequest();
+	}
+	return 0;
+}
+
+int Client::sendMessage(std::string value){
+	if(activePartnerSocket){
+		std::string mess = "MESS:" + value;
+		//mess = encipher(mess);//funkcnost netusim
+		activePartnerSocket->SendLine(mess);
+		return 0;
+	}else{
+		std::cout<<"  Message not sent(no recipient connected)\n";
+		return -1;
+	}
+}
+
+int Client::command(std::string cmd){
+	int action;
+	std::string value;
+	action = commandParse(value , cmd);
+	switch(action){
+		case 0://help
+			help();
+			return 0;
+		case 1://register
+			registrationRequest();
+			return 0;
+		case 2://login 
+			loginRequest(value);
+			return 0;
+		case 3://online
+			listRequest();
+			return 0;
+		case 4://connect
+			connectToPartner(value);
+			return 0;
+		case 5://accept
+			acceptComm();
+			return 0;
+		case 6://decline
+			declineComm();
+			return 0;
+		case 7://end
+			endComm();
+			return 0;
+		case 8://disconnect
+			disconnect();
+			return 0;
+		case 9://quit
+			quit();
+			std::cout<<"Have a nice day.\n";
+			return -11;
+		}
+}
+
+int Client::commandParse(std::string& value , std::string cmd){
+	std::vector<string> command = split(cmd , ":");
+	if(command.size() > 1)
+		value = command[1];
+	
+
+	if(command[0].compare("/help") == 0){return 0;}
+	if(command[0].compare("/register") == 0){return 1;}
+	if(command[0].compare("/login") == 0){return 2;}
+	if(command[0].compare("/online") == 0){return 3;}
+	if(command[0].compare("/connect") == 0){return 4;}
+	if(command[0].compare("/accept") == 0){return 5;}
+	if(command[0].compare("/decline") == 0){return 6;}
+	if(command[0].compare("/end") == 0){return 7;}
+	if(command[0].compare("/disconnect") == 0){return 8;}
+	if(command[0].compare("/quit") == 0){return 9;}
+	
+	std::cout<<"Unknown command.\n";
+	return -1;
+}
+
+void Client::help(){
+	std::cout<<"Type:\n";
+	std::cout<<"  \"/register\" to register on server\n";//1
+	std::cout<<"  \"/login:[pwd]\" to log in on server, pwd is your password\n";//2
+	std::cout<<"  \"/online\" to see who is online\n";//3
+	std::cout<<"  \"/connect:[user]\" to connect to specific user\n";//4
+	std::cout<<"  \"/accept\" to accept incoming connection\n";//5
+	std::cout<<"  \"/decline\" to decline incoming connection\n";//6
+	std::cout<<"  \"/end\" to end actual communication\n";//7
+	std::cout<<"  \"/disconnect\" to disconnect from server\n";//8
+	std::cout<<"  \"/quit\" to end program\n";//9
 }

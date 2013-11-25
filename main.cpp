@@ -65,26 +65,7 @@ unsigned int pre_generatingKeyEnc(void* s)
 	}
 	return 0;
 }
-int commandParse(std::string& value , std::string cmd){
-	std::vector<string> command = split(cmd , ":");
-	if(command.size() > 1)
-		value = command[1];
-	
 
-	if(command[0].compare("/help") == 0){return 0;}
-	if(command[0].compare("/register") == 0){return 1;}
-	if(command[0].compare("/login") == 0){return 2;}
-	if(command[0].compare("/online") == 0){return 3;}
-	if(command[0].compare("/connect") == 0){return 4;}
-	if(command[0].compare("/accept") == 0){return 5;}
-	if(command[0].compare("/decline") == 0){return 6;}
-	if(command[0].compare("/end") == 0){return 7;}
-	if(command[0].compare("/disconnect") == 0){return 8;}
-	if(command[0].compare("/quit") == 0){return 9;}
-	
-	std::cout<<"Unknown command.\n";
-	return -1;
-}
 
 UINT output(LPVOID s){
 	Socket* server = (Socket*) s;
@@ -164,19 +145,6 @@ UINT clientWaiting(LPVOID a)
 		std::cout<<"vynimka";
 	}
 	return 0;
-}
-
-void help(){
-	std::cout<<"Type:\n";
-	std::cout<<"  \"/register\" to register on server\n";//1
-	std::cout<<"  \"/login:[pwd]\" to log in on server, pwd is your password\n";//2
-	std::cout<<"  \"/online\" to see who is online\n";//3
-	std::cout<<"  \"/connect:[user]\" to connect to specific user\n";//4
-	std::cout<<"  \"/accept\" to accept incoming connection\n";//5
-	std::cout<<"  \"/decline\" to decline incoming connection\n";//6
-	std::cout<<"  \"/end\" to end actual communication\n";//7
-	std::cout<<"  \"/disconnect\" to disconnect from server\n";//8
-	std::cout<<"  \"/quit\" to end program\n";//9
 }
 
 //cakacia metoda serveru... oddelujem informacia v spravach pres server dvojbodkou... to sda parsuju a vola sa prislusna metoda na 
@@ -277,15 +245,15 @@ int main(int argc , char** argv){
 	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c);
 	Client* c1 = new Client("Janko");
 	CWinThread* crypt1 = new CWinThread();
-	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c1);
+	crypt1 = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c1);
 	string	pokus = c->encipher("ahoj");
 	cout << pokus;
-	pokus = c1->encipher(pokus);
+	pokus = c1->decipher(pokus);
 	cout << pokus;
 	cin.get();
 	}*/
 	if(argc != 2){
-		std::cerr<<"[ERROR] Bad argument."<<std::endl;
+		std::cerr<<"[ERROR] Unknown argument. Use argument server or client\n";
 		return 1;
 	}
 	unsigned int port = 0;
@@ -310,112 +278,21 @@ int main(int argc , char** argv){
 		std::cout<<"For a list of commands type \"/help\"\n";
 		myClient = new Client(login);
 
-		while(!quit){
+		while(true){
 			std::string cmd;
-			std::stringstream buff;
-			int action = -1;
-			int n = 0;
 
 			std::getline(std::cin , cmd);
 			if(cmd.size() == 0){std::getline(std::cin , cmd);}
-			buff.clear();
 
 			if(cmd[0] == '/'){
-				std::string value;
-				action = commandParse(value , cmd);
-				switch(action){
-				case 0://help
-					help();
+				if(myClient->command(cmd) == -11)
 					break;
-				case 1://register
-					n = myClient->registrationRequest();
-					break;
-				case 2://login 
-					myClient->loginRequest(value);
-					break;
-				case 3://online
-					myClient->listRequest();
-					break;
-				case 4://connect
-					if(!myClient->activePartnerSocket){
-						myClient->partnerName = value;
-						myClient->communicationRequest(value);
-					}else{
-						std::cout<<"  You already have ongoing communication.\n";	
-					}
-					break;
-				case 5://accept
-					if(myClient->incomingConnection){
-						std::cout<<"You are now connected to "<<myClient->partnerName<<std::endl;
-						buff<<"YES:"<<myClient->port;
-						Sleep(100);
-						myClient->activePartnerSocket->SendLine(buff.str());
-					}else{
-						std::cout<<"  You have currently no incoming connections.\n";
-					}
-					break;
-				case 6://decline
-					if(myClient->incomingConnection){
-						buff<<"NO";
-						myClient->activePartnerSocket->SendLine(buff.str());
-						delete myClient->activePartnerSocket;
-						myClient->activePartnerSocket = NULL;
-					}else{
-						std::cout<<"  You have currently no incoming connections.\n";
-					}
-					break;
-				case 7://end
-					if(myClient->activePartnerSocket){
-						buff<<"END";
-						myClient->activePartnerSocket->SendLine(buff.str());
-						delete myClient->activePartnerSocket;
-						myClient->activePartnerSocket = NULL;
-					}else{
-						std::cout<<"  You have currently no ongoing communication.\n";
-					}
-					break;
-				case 8://disconnect
-					if(myClient->activeServerSocket){
-						myClient->logoutRequest();
-					}else{
-						std::cout<<"  You are not connected at this moment.\n";	
-					}
-					break;
-				case 9://quit
-					std::cout<<"Have a nice day.\n";
-					if(myClient->activePartnerSocket){
-						buff<<"END";
-						myClient->activePartnerSocket->SendLine(buff.str());
-						delete myClient->activePartnerSocket;
-					}
-					if(myClient->activeServerSocket){
-						myClient->logoutRequest();
-					}
-					quit = true;
-					break;
-				}
 			}else{
-				if(myClient->activePartnerSocket){
-					std::string mess = "MESS:";
-					mess = mess + cmd;
-					//mess = myClient->encipher(mess); //MOJE//uplne dobre to nefunguje(lubo)
-					myClient->activePartnerSocket->SendLine(mess);
-				}else{
-					std::cout<<"  Message not sent(no recipient connected)\n";
-				}
+				myClient->sendMessage(cmd);
 			}
 		}
 		delete myClient;
 	}
-
-	if(tmp.compare("testServer") == 0){
-			
-	}
-
-	if(tmp.compare("testClient") == 0){
-		
-	}
-
 	return 0;
 }
 
