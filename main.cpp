@@ -147,50 +147,56 @@ UINT clientWaiting(LPVOID a)
 	return 0;
 }
 
-//cakacia metoda serveru... oddelujem informacia v spravach pres server dvojbodkou... to sda parsuju a vola sa prislusna metoda na 
-//parsovanie som si odniekial skopirovala metode co fungujre podobne ako split v jave... jej definicia je ulozena v struct suboroch. 
-//je tu vyriesena registracia, login, ziadost o zaslanie zoznamu online userov a ziadsot o komunikaciu s jednym z nich. chyba len logout.. to by nemolo byt nic zlozite
+void sendMessage(Socket* pSocket, int conf)
+{
+	if(conf == 0) pSocket->SendLine("OK:");
+	else pSocket->SendLine("NOK");
+}
+
+void parseMessage(Socket* pSocket, std::string receiveLine){
+
+	vector<string> message = split(receiveLine,":");
+	if(message[0]=="REG")
+	{
+		int conf;
+		string psw = Server::generatePassword();
+		conf = myServer->registration(message[1],psw,NULL);
+		if (conf==0) pSocket->SendLine("OK:"+ psw);
+		else pSocket->SendLine("NOK");
+	}
+	if(message[0]=="LOGIN")
+	{
+		cout<< receiveLine <<endl;
+		int conf;
+		conf = myServer->login(message[1],message[2],atoi(message[3].c_str()));
+		sendMessage(pSocket, conf);
+	}
+	if(message[0]=="LIST")
+	{
+		string conf = myServer->sendlist(message[1]);
+		pSocket->SendLine(conf);
+	}
+	if(message[0]=="COMM")
+	{
+		int conf = myServer->startClientCommunication(message[1],message[2]);
+		sendMessage(pSocket, conf);
+	}
+	if(message[0]=="LOGOUT"){
+		int conf = myServer->logout(message[1]);
+		sendMessage(pSocket, conf);
+	}
+}
+
 UINT answer(LPVOID s){
 	Socket* pSocket = (Socket*) s;
 	while(1){
 		Sleep(100);
 		if(pSocket != NULL){
+
 			std::string r = pSocket->ReceiveLine();
 			r = r.substr(0,r.size()-1);
 			if(r != ""){
-				vector<string> message = split(r,":");
-				if(message[0]=="REG")
-				{
-					int conf;
-					string psw = Server::generatePassword();
-					conf = myServer->registration(message[1],psw,NULL);
-					if (conf==0) pSocket->SendLine("OK:"+ psw);
-					else pSocket->SendLine("NOK");
-				}
-				if(message[0]=="LOGIN")
-				{
-					cout<< r <<endl;
-					int conf;
-					conf = myServer->login(message[1],message[2],atoi(message[3].c_str()));
-					if (conf==0) pSocket->SendLine("OK");
-					else pSocket->SendLine("NOK");
-				}
-				if(message[0]=="LIST")
-				{
-					string conf = myServer->sendlist(message[1]);
-					pSocket->SendLine(conf);
-				}
-				if(message[0]=="COMM")
-				{
-					int conf = myServer->startClientCommunication(message[1],message[2]);
-					if (conf==0) pSocket->SendLine("OK");
-					else pSocket->SendLine("NOK");
-				}
-				if(message[0]=="LOGOUT"){
-					int conf = myServer->logout(message[1]);
-					if (conf==0) pSocket->SendLine("OK");
-					else pSocket->SendLine("NOK");
-				}
+				parseMessage(pSocket, r);
 			}
 		}
 	}
@@ -253,7 +259,7 @@ int main(int argc , char** argv){
 	cin.get();
 	}*/
 	if(argc != 2){
-		std::cerr<<"[ERROR] Unknown argument. Use argument server or client\n";
+		std::cerr<<"[ERROR] Unknown argument. Use argument \"server\" or \"client\"\n";
 		return 1;
 	}
 	unsigned int port = 0;
@@ -278,15 +284,14 @@ int main(int argc , char** argv){
 		std::cout<<"For a list of commands type \"/help\"\n";
 		myClient = new Client(login);
 
-		while(true){
+		while(!quit){
 			std::string cmd;
 
 			std::getline(std::cin , cmd);
 			if(cmd.size() == 0){std::getline(std::cin , cmd);}
 
 			if(cmd[0] == '/'){
-				if(myClient->command(cmd) == -11)
-					break;
+				quit = myClient->command(cmd);
 			}else{
 				myClient->sendMessage(cmd);
 			}

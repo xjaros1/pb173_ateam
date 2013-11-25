@@ -178,7 +178,7 @@ private:
 	int quit();
 	void help();
 public:
-	int command(std::string);
+	bool command(std::string);
 	int sendMessage(std::string);
 //static	UINT clientWaiting(LPVOID a);
 	std::string encipher(std::string text);

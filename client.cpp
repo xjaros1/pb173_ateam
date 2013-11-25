@@ -285,43 +285,44 @@ int Client::sendMessage(std::string value){
 	}
 }
 
-int Client::command(std::string cmd){
+bool Client::command(std::string cmd){
 	int action;
 	std::string value;
 	action = commandParse(value , cmd);
 	switch(action){
 		case 0://help
 			help();
-			return 0;
+			break;
 		case 1://register
 			registrationRequest();
-			return 0;
+			break;
 		case 2://login 
 			loginRequest(value);
-			return 0;
+			break;
 		case 3://online
 			listRequest();
-			return 0;
+			break;
 		case 4://connect
 			connectToPartner(value);
-			return 0;
+			break;
 		case 5://accept
 			acceptComm();
-			return 0;
+			break;
 		case 6://decline
 			declineComm();
-			return 0;
+			break;
 		case 7://end
 			endComm();
-			return 0;
+			break;
 		case 8://disconnect
 			disconnect();
-			return 0;
+			break;
 		case 9://quit
 			quit();
 			std::cout<<"Have a nice day.\n";
-			return -11;
+			return true;
 		}
+	return false;
 }
 
 int Client::commandParse(std::string& value , std::string cmd){
