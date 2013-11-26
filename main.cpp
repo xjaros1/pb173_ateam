@@ -22,6 +22,7 @@
 
 Server* myServer;//globalne premenne ktore som pouzila kvoli tomu ze vlaknova funkcia ma byt staticka
 Client* myClient;
+
 unsigned int pre_generatingKeyEnc(void* s)
 {
 	unsigned char key[16] = {212,212,212,212,212,212,212,212,212,212,212,212,212,212,212,212};
@@ -36,7 +37,7 @@ unsigned int pre_generatingKeyEnc(void* s)
 	aes_context ctx;
 	while(true)
 	{
-		if(((k->putPointerEnc>k->getPointerEnc) &&  ((k->putPointerEnc +16)>1000) && (((k->putPointerEnc +16)%1000)>k->getPointerEnc)) || ((k->putPointerEnc<k->getPointerEnc)&&((k->putPointerEnc + 16)>k->getPointerEnc)) || k->putPointerEnc == k->getPointerEnc)
+		if (k->getPointerEnc<984)
 	{
 		for(int i = 15;i>=0;i--)
 		{
@@ -45,11 +46,19 @@ unsigned int pre_generatingKeyEnc(void* s)
 			x = x/256;
 		}
 		aes_setkey_enc(&ctx, key, 128);
-		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,k->encBuffer+k->putPointerEnc);
+		unsigned char output[16];
+		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,output);
+		for(int i = 0;i<16;i++)
+		{
+			k->encBuffer[(k->putPointerEnc+i)%1000] = output[i];
+		}
 		k->counterEnc++;
-		k->putPointerEnc++;
+		k->putPointerEnc+=16;
+		k->putPointerEnc = k->putPointerEnc % 1000;
+		k->getPointerEnc+=16;
+		cout << k->getPointerEnc<<endl;
 	}
-		if(((k->putPointerDec>k->getPointerDec) &&  ((k->putPointerDec +16)>1000) && (((k->putPointerDec +16)%1000)>k->getPointerDec)) || ((k->putPointerDec<k->getPointerDec)&&((k->putPointerDec + 16)>k->getPointerDec)) || k->putPointerDec == k->getPointerDec)
+		if(k->getPointerDec<984)
 	{
 		for(int i = 15;i>=0;i--)
 		{
@@ -58,13 +67,21 @@ unsigned int pre_generatingKeyEnc(void* s)
 			x = x/256;
 		}
 		aes_setkey_enc(&ctx, key, 128);
-		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,k->decBuffer+k->putPointerDec);
+		unsigned char output[16];
+		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,output);
+		for(int i = 0;i<16;i++)
+		{
+			k->decBuffer[(k->putPointerDec+i)%1000] = output[i];
+		}
 		k->counterDec++;
-		k->putPointerDec++;
+		k->putPointerDec+=16;
+		k->putPointerDec = k->putPointerDec % 1000;
+		k->getPointerDec+=16;
 	}
 	}
 	return 0;
 }
+
 
 
 UINT output(LPVOID s){
