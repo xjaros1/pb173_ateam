@@ -5,8 +5,10 @@
 #include <string>
 #include <afxwin.h>
 
-
 #include "polarssl/aes.h"
+#include "polarssl/entropy.h"
+#include "polarssl/ctr_drbg.h"
+
 #include "socket.h"
 #include "struct.h"
 //#include "minunit.h"
@@ -24,10 +26,11 @@ struct adress{
 class Client{
 public:
 	SocketClient* activePartnerSocket;
-	SocketClient* activeServerSocket;// premenna sluzi na to aby som mohls v lubovolnej metode ked uz som sa rraz na server nepojila mohla s nim komunikovat
+	SocketClient* activeServerSocket;
 	std::string partnerName;
 	int port;
 	bool incomingConnection;
+	unsigned char key[16];
 	unsigned char encBuffer[1000];
 	unsigned char decBuffer[1000];
 	int getPointerEnc;
@@ -36,21 +39,16 @@ public:
 	int getPointerDec;
 	int putPointerDec;
 	int counterDec;
+	bool stop;
 private:
-	
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
-	unsigned char symKey[32];
-	unsigned char iv[32];	// inicializacny vektor
 	personInfo PI;
 	std::string login;
 	cert myCert;
 	cert partnerCert;
 	adress myAdress;
 	adress partnerAdress;
-	
-	
-	bool stop;
 public:
 	Client(string login);
 	/**
@@ -77,25 +75,6 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int cryptoAsym(unsigned char key[128] , unsigned char* data , unsigned char* outData , int mode);
-
-	/**
-	* Sends data to other client.
-	*
-	* @param partnerAdress other client's adress
-	* @param data data to be send
-	*
-	* @return returns zero when succesful, nonzero value otherwise
-	*/
-	int sendData(int port);
-
-	/**
-	* Generates random AES key.
-	*
-	* @param key generated key
-	*
-	* @return returns zero when succesful, nonzero value otherwise
-	*/
-	int randGenAES(unsigned char* key);
 
 	/**
 	* Generates random pair of RSA keys.
@@ -157,10 +136,6 @@ public:
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
 	int certificateRequest(requestType rt , personInfo PI);
-	
-	/*int connectTo(std::string IP, int port);
-	int receiveData(char* buff, int len);
-	int endSocket();*/
 
 	/*
 	* Metody pre obsluhu prikazov uzivatela(Lubo)
@@ -180,8 +155,23 @@ private:
 public:
 	bool command(std::string);
 	int sendMessage(std::string);
-//static	UINT clientWaiting(LPVOID a);
+
+	/**
+	* XOR given plaintext to pre-generated encryption buffer
+	* 
+	* @param text plaintext to be enciphered
+	*
+	* @return ciphertext
+	*/
 	std::string encipher(std::string text);
+
+	/**
+	* XOR given ciphertext to pre-generated decryption buffer
+	*
+	* @param text ciphertext to be decrypted
+	*
+	* @return plaintext
+	*/
 	std::string decipher(std::string text);
 };
 

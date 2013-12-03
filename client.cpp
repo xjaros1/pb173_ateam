@@ -3,9 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-Client::Client(string login){// klient sa pokusa spojit so serverom hned ako sa vytvori
-	CWinThread* crypt = new CWinThread();
-	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) this);
+Client::Client(string login){
 	this->login = login;
 	stop = false;
 	incomingConnection = false;
@@ -14,12 +12,12 @@ Client::Client(string login){// klient sa pokusa spojit so serverom hned ako sa 
 		activeServerSocket = new SocketClient("127.0.0.1" , SERVER_DEFAULT_PORT);
 	}catch(...)
 	{
-		std::cout<<"Connection error.\n";
-		activeServerSocket = NULL; // premenna sluzi na to aby som mohls v lubovolnej metode ked uz som sa rraz na server nepojila mohla s nim komunikovat
+		std::cout<<"[ERROR] Connection error.\n";
+		activeServerSocket = NULL;
 	}
 }
 
-int Client::registrationRequest(){// v tych jednotlivych requestochvacsinou nie je nic zlozite
+int Client::registrationRequest(){
 	std::string toSend;
 	toSend = "REG";
 	toSend += ":";
@@ -31,11 +29,11 @@ int Client::registrationRequest(){// v tych jednotlivych requestochvacsinou nie 
 	r = r.substr(0,r.size()-1);
 	vector<string> message = split(r,":");
 	if((message[0]=="OK")){
-		std::cout<<"Registration succesfull.\n";
+		std::cout<<"Registration successfull.\n";
 		std::cout<<"Your password is: "<<message[1]<<std::endl;
 		return 0;
 	}else{
-		std::cout<<"Registration failed.\n";
+		std::cout<<"[ERROR] Registration failed.\n";
 		return -1;
 	}
 }
@@ -83,13 +81,13 @@ int Client::loginRequest(string password)
 	r = r.substr(0,r.size()-1);
 	vector<string> message = split(r,":");
 	if((message[0]=="OK")){
-		std::cout<<"Login succesful.\n";
+		std::cout<<"Login successful.\n";
 		SocketServer* server = new SocketServer(p , 1);		
 		CWinThread* m_WaitingClient = new CWinThread();
 		m_WaitingClient = AfxBeginThread(clientWaiting , (LPVOID) server);
 		return 0;
 	}else{
-		std::cout<<"Login failed.\n";
+		std::cout<<"[ERROR] Login failed.\n";
 		return -1;
 	}
 	return 0;
@@ -109,7 +107,7 @@ int Client::communicationRequest(string partnerLogin)
 	r = r.substr(0,r.size()-1);
 	vector<string> message = split(r,":");
 	if((message[0]=="OK")) cout << "Invitation send, wait for answer.\n";
-	else cout << "An error occured, communication won't be established.\n";
+	else cout << "[ERROR] An error occured, communication won't be established.\n";
 	return 0;
 }
 
@@ -123,7 +121,7 @@ int Client::logoutRequest(){
 	r = r.substr(0,r.size()-1);
 	vector<string> message = split(r,":");
 	if((message[0]=="OK")) cout << "You have been disconnected.\n";
-	else cout << "An error occured, you are still connected.\n";
+	else cout << "[ERROR] An error occured, you are still connected.\n";
 	delete activeServerSocket;
 	activeServerSocket = NULL;
 	return 0;
@@ -168,12 +166,13 @@ string Client::encipher(string text)
 	bool done = false;
 	while(!done)
 	{
-		while (this->getPointerEnc != this->putPointerEnc)
+		while (getPointerEnc != putPointerEnc)
 		{
 			if (i == text.size()) {done = true;break;}
-			cipherText[i] = text[i] ^ this->encBuffer[getPointerEnc];
+			cipherText[i] = text[i] ^ encBuffer[getPointerEnc];
+			cipherText[i]++;
 			i++;
-			getPointerEnc++;
+			getPointerEnc = (getPointerEnc + 1) % 1000;
 		}
 	}
 	return cipherText;
@@ -186,12 +185,13 @@ string Client::decipher(string text)
 	bool done = false;
 	while(!done)
 	{
-		while (this->getPointerDec != this->putPointerDec)
+		while (getPointerDec != putPointerDec)
 		{
 			if (i == text.size()) {done = true;break;}
-			plainText[i] = text[i] ^ this->decBuffer[getPointerDec];
+			text[i]--;
+			plainText[i] = text[i] ^ decBuffer[getPointerDec];
 			i++;
-			getPointerDec++;
+			getPointerDec = (getPointerDec + 1) % 1000;
 		}
 	}
 	return plainText;
@@ -203,7 +203,7 @@ int Client::connectToPartner(std::string value){
 		communicationRequest(value);
 		return 0;
 	}else{
-		std::cout<<"  You already have ongoing communication.\n";
+		std::cout<<"[INVALID COMMAND] You already have ongoing communication.\n";
 		return -1;
 	}
 }
@@ -211,13 +211,29 @@ int Client::connectToPartner(std::string value){
 int Client::acceptComm(){
 	if(incomingConnection){
 		std::stringstream buff;
-		buff<<"YES:"<<port;
+
+		ctr_drbg_context ctr_drbg;											
+		entropy_context entropy;
+		char *pers = "Rebus in adversis animum submittere noli: spem retine, spes una hominen nec morte relin quit.";
+
+		entropy_init( &entropy );										
+		ctr_drbg_init( &ctr_drbg, entropy_func, &entropy , (unsigned char *) pers, strlen( pers ) );
+		ctr_drbg_random( &ctr_drbg , key , 16 );
+		std::string keyToSend;
+		for(int i = 0 ; i < 16 ; i++){
+			keyToSend.push_back(key[i]);
+		}
+		buff<<"YES:"<<port<<":"<<keyToSend;
 		Sleep(100);
 		activePartnerSocket->SendLine(buff.str());
-		std::cout<<"You are now connected to "<<partnerName<<std::endl;
+		std::cout<<"You are now connected to "<<partnerName<<"."<<std::endl;
+
+		stop = false;
+		CWinThread* crypt = new CWinThread();
+		crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) this);
 		return 0;
 	}else{
-		std::cout<<"  You have currently no incoming connections.\n";
+		std::cout<<"[INVALID COMMAND] You have currently no incoming connections.\n";
 		return -1;
 	}
 }
@@ -231,7 +247,7 @@ int Client::declineComm(){
 		activePartnerSocket = NULL;
 		return 0;
 	}else{
-		std::cout<<"  You have currently no incoming connections.\n";
+		std::cout<<"[INVALID COMMAND] You have currently no incoming connections.\n";
 		return -1;
 	}
 }
@@ -243,9 +259,10 @@ int Client::endComm(){
 		activePartnerSocket->SendLine(buff);
 		delete activePartnerSocket;
 		activePartnerSocket = NULL;
+		stop = true;
 		return 0;
 	}else{
-		std::cout<<"  You have currently no ongoing communication.\n";
+		std::cout<<"[INVALID COMMAND] You have currently no ongoing communication.\n";
 		return -1;
 	}
 }
@@ -255,17 +272,14 @@ int Client::disconnect(){
 		logoutRequest();
 		return 0;
 	}else{
-		std::cout<<"  You are not connected at this moment.\n";
+		std::cout<<"[INVALID COMMAND] You are not connected at this moment.\n";
 		return -1;
 	}
 }
 
 int Client::quit(){
 	if(activePartnerSocket){
-		std::string buff;
-		buff = "END";
-		activePartnerSocket->SendLine(buff);
-		delete activePartnerSocket;
+		endComm();
 	}
 	if(activeServerSocket){
 		logoutRequest();
@@ -276,11 +290,11 @@ int Client::quit(){
 int Client::sendMessage(std::string value){
 	if(activePartnerSocket){
 		std::string mess = "MESS:" + value;
-		//mess = encipher(mess);//funkcnost netusim
+		mess = encipher(mess);
 		activePartnerSocket->SendLine(mess);
 		return 0;
 	}else{
-		std::cout<<"  Message not sent(no recipient connected)\n";
+		std::cout<<"[INVALID COMMAND] Message not sent(no recipient connected)\n";
 		return -1;
 	}
 }
@@ -290,34 +304,34 @@ bool Client::command(std::string cmd){
 	std::string value;
 	action = commandParse(value , cmd);
 	switch(action){
-		case 0://help
+		case 0:
 			help();
 			break;
-		case 1://register
+		case 1:
 			registrationRequest();
 			break;
-		case 2://login 
+		case 2: 
 			loginRequest(value);
 			break;
-		case 3://online
+		case 3:
 			listRequest();
 			break;
-		case 4://connect
+		case 4:
 			connectToPartner(value);
 			break;
-		case 5://accept
+		case 5:
 			acceptComm();
 			break;
-		case 6://decline
+		case 6:
 			declineComm();
 			break;
-		case 7://end
+		case 7:
 			endComm();
 			break;
-		case 8://disconnect
+		case 8:
 			disconnect();
 			break;
-		case 9://quit
+		case 9:
 			quit();
 			std::cout<<"Have a nice day.\n";
 			return true;

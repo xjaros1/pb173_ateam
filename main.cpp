@@ -1,31 +1,12 @@
-//v prvom rade treba vyriesit preco mi komunikacia medzi klientami blbne... vyzera ze sa tam posiela nejaky riadok navyse. skus si to spustiti ako jeden program 
-//ako server a dvoch klientov obobch zaregistruj,prihlas a jednym sa pokus skontaktovat toho druheho... v jednom klientovi ti vypadne nieco ako ak chcete potvrdit 
-//komunikaciu stlacte a. tu teba stalit a dvakrat.. to je ten problem co som riesilôa so svendom s tym cin.get() mozes to popripade toto potvrdenie cele zrusit.
-
-//dalej treba dokoncit tenr logout. ja ho nemam nie preto ze by samotny logout bol problem ale kedze som nevyriesila ako ukoncit komunikaciu medzi klientami tak som sa venovala 
-//tomu.. asi skus normalne do mainu pridat moznost ze ked klient nieco stlaci tak sa posle logout request.
-
-//treba vymysliet ako sa bude dat skoncit komunikacia medzi klientami najrozumnejsie bude asi zaviest nejaky fixnz retazec ktory sa neposle ale vzdy sa nan bude testovat a ked sa 
-//objavi komunikacia sa ukonci. co znamena ze sa prerusiten nekonecny while cyklus snedline-ov a receiveline-ov
-
-//dalej v maine je to riesene tak ze klient ma atribut komunicacion ktory ked je zapnuty tak sa prerusi ten hlavny cyklus co vypisuje "ak sa chces prihlasit stlac p, ak registrovat 
-//stlac r, ak komunikovat stlacte k\n" problem je ze on sa uplne zrusi a aj ked by sa komunikacia ukoncila tak uz sa neda vpoddstate nic robit.. takze to treba este vyriesit.
-
-
-//volitelne sa da este prerobit ta vec s globalnymi premmnymi ak si pocuival a pametas si moj rozhovor so svendom.. ze by sa vlaknobvej funkcii nepredaval len ten socket ale 
-//trebars struktura ktorA  by obsahovala este aj ukazatel na naseho klienta alebo na ans server.. podla toho co je potreba.. toto nie je az tak nutne kvoli funkcnosti.. 
-//len by sme zrusili globalne premenne a teda si trosku skrajsili kod.
-
 #include <iostream>
 #include "server.h"
 #include "client.h"
 
-Server* myServer;//globalne premenne ktore som pouzila kvoli tomu ze vlaknova funkcia ma byt staticka
+Server* myServer;
 Client* myClient;
 
 unsigned int pre_generatingKeyEnc(void* s)
 {
-	unsigned char key[16] = {212,212,212,212,212,212,212,212,212,212,212,212,212,212,212,212};
 	Client* k = (Client*) s;
 	k->counterEnc = 0;
 	k->counterDec = 0;
@@ -33,56 +14,73 @@ unsigned int pre_generatingKeyEnc(void* s)
 	k->putPointerEnc = 0;
 	k->getPointerDec = 0;
 	k->putPointerDec = 0;
-	unsigned char  input[16];
+	unsigned char input[16];
 	aes_context ctx;
-	while(true)
-	{
-		if (k->getPointerEnc<984)
-	{
-		for(int i = 15;i>=0;i--)
-		{
+
+	do{
+		for(int i = 15 ; i >= 0 ; i--){
 			int x = k->counterEnc;
-			input[i] = x%256;
-			x = x/256;
+			input[i] = x % 256;
+			x = x / 256;
 		}
-		aes_setkey_enc(&ctx, key, 128);
+		aes_setkey_enc(&ctx , k->key , 128);
 		unsigned char output[16];
-		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,output);
-		for(int i = 0;i<16;i++)
-		{
-			k->encBuffer[(k->putPointerEnc+i)%1000] = output[i];
+		aes_crypt_ecb(&ctx , AES_ENCRYPT , input , output);
+
+		for(int i = 0 ; i < 16 ; i++){
+			k->encBuffer[k->putPointerEnc + i] = output[i];
+			k->decBuffer[k->putPointerEnc + i] = output[i];
 		}
+
 		k->counterEnc++;
-		k->putPointerEnc+=16;
-		k->putPointerEnc = k->putPointerEnc % 1000;
-		k->getPointerEnc+=16;
-		cout << k->getPointerEnc<<endl;
-	}
-		if(k->getPointerDec<984)
-	{
-		for(int i = 15;i>=0;i--)
-		{
-			int x = k->counterDec;
-			input[i] = x%256;
-			x = x/256;
+		k->putPointerEnc += 16;
+		k->putPointerDec += 16;
+	}while((k->putPointerEnc + 16) < 1000);
+
+	while(!k->stop){
+		Sleep(100);
+
+		int lim = k->getPointerEnc - 16;
+		if(lim < 0 && k->putPointerEnc >= 16)lim = 1000 + lim;
+
+		if ((k->putPointerEnc % 1000) < lim){
+			if(k->putPointerEnc == -1)k->putPointerEnc++;
+			for(int i = 15 ; i >= 0 ; i--){
+				int x = k->counterEnc;
+				input[i] = x % 256;
+				x = x / 256;
+			}
+			aes_setkey_enc(&ctx , k->key , 128);
+			unsigned char output[16];
+			aes_crypt_ecb(&ctx , AES_ENCRYPT , input , output);
+			for(int i = 0 ; i < 16 ; i++){
+				k->encBuffer[(k->putPointerEnc + i) % 1000] = output[i];
+			}
+			k->counterEnc++;
+			k->putPointerEnc = (k->putPointerEnc + 16) % 1000;
 		}
-		aes_setkey_enc(&ctx, key, 128);
-		unsigned char output[16];
-		aes_crypt_ecb(&ctx,AES_ENCRYPT,input,output);
-		for(int i = 0;i<16;i++)
-		{
-			k->decBuffer[(k->putPointerDec+i)%1000] = output[i];
+		
+		lim = k->getPointerDec - 16;
+		if(lim < 0 && k->putPointerDec >= 16)lim = 1000 + lim;
+
+		if((k->putPointerDec % 1000) < lim ){
+			for(int i = 15;i>=0;i--){
+				int x = k->counterDec;
+				input[i] = x%256;
+				x = x/256;
+			}
+			aes_setkey_enc(&ctx, k->key, 128);
+			unsigned char output[16];
+			aes_crypt_ecb(&ctx,AES_ENCRYPT,input,output);
+			for(int i = 0;i<16;i++){
+				k->decBuffer[(k->putPointerDec + i) % 1000] = output[i];
+			}
+			k->counterDec++;
+			k->putPointerDec = (k->putPointerDec + 16) % 1000;
 		}
-		k->counterDec++;
-		k->putPointerDec+=16;
-		k->putPointerDec = k->putPointerDec % 1000;
-		k->getPointerDec+=16;
-	}
 	}
 	return 0;
 }
-
-
 
 UINT output(LPVOID s){
 	Socket* server = (Socket*) s;
@@ -93,7 +91,6 @@ UINT output(LPVOID s){
 		bool understand = false;
 		
 		Sleep(100);
-		//r = r.substr(0,r.size()-1);
 		vector<string> message = split(r,":");
 		message[message.size()-1] = message[message.size()-1].substr(0,message[message.size()-1].size()-1);
 
@@ -108,7 +105,12 @@ UINT output(LPVOID s){
 		
 		if(message[0].compare("YES") == 0){
 			std::cout<<"Connection accepted.\n";
-			myClient->activePartnerSocket = new SocketClient("127.0.0.1" , atoi(message[1].c_str()));			
+			myClient->activePartnerSocket = new SocketClient("127.0.0.1" , atoi(message[1].c_str()));
+			for(int i = 0 ; i < 16 ; i++){myClient->key[i] = message[2][i];}
+			CWinThread* crypt = new CWinThread();
+			myClient->stop = false;
+			crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) myClient);
+
 			understand = true;
 		}
 		if(message[0].compare("NO") == 0){
@@ -119,6 +121,7 @@ UINT output(LPVOID s){
 		}
 		if(message[0].compare("END") == 0){
 			std::cout<<"Connection terminated on partner's side.\n";
+			myClient->stop = true;
 			delete myClient->activePartnerSocket;
 			myClient->activePartnerSocket = NULL;
 			understand = true;
@@ -130,11 +133,10 @@ UINT output(LPVOID s){
 		}
 		if (!understand)
 		{
-			r = myClient->decipher(r);//moje
-			//r = r.substr(0,r.size()-1);//moje
-			message = split(r,":");//moje
+			r = r.substr(0,r.size()-1);
+			r = myClient->decipher(r);
+			message = split(r,":");
 			if(message[0].compare("MESS") == 0){
-				message[1] = message[1].substr(0,message[1].size()-1);
 				cout<<myClient->partnerName<<" says: "<<message[1]<<std::endl;
 			}
 		}
@@ -143,9 +145,6 @@ UINT output(LPVOID s){
 	return 0;
 }
 
-//funkcia v ktorej klient caka na spravu. ta prva cast, teda prvy while cyklus je pouzity v pripade ze tento klient dostal od serveru ziadost o komunikaciu. 
-//a on ako prvy poslal spravu (v metode klienta send data) teda v ramci klientskej komunikacie.. sa hra na klienta (nie server) kedze komunikacia zacala uz inde poouzivam nie socket 
-//ziskany z metody accept ale activePartnerSocket ktory bol vytvoreny v tej metode send data. mozno by sa dal cely ten while cyklus presunut tam. 
 UINT clientWaiting(LPVOID a) 
 {
 	SocketServer* pSocketClient = (SocketServer*) a;
@@ -183,7 +182,6 @@ void parseMessage(Socket* pSocket, std::string receiveLine){
 	}
 	if(message[0]=="LOGIN")
 	{
-		cout<< receiveLine <<endl;
 		int conf;
 		conf = myServer->login(message[1],message[2],atoi(message[3].c_str()));
 		sendMessage(pSocket, conf);
@@ -248,33 +246,10 @@ UINT waiting(LPVOID a){//toto caka na spojenie
 }
 
 
-/*************************************************
+/************************************************
 >>>>>>>>>>>>>>>>>>>>>>>MAIN<<<<<<<<<<<<<<<<<<<<<<
 *************************************************/
 int main(int argc , char** argv){
-	/*unsigned int port = 0;
-	std::string tmp = argv[1];
-	if(tmp.compare("server") == 0){
-		std::cout<<"Running as a server."<<std::endl;		
-		myServer = new Server();
-		starting(SERVER_DEFAULT_PORT);
-		std::cout<<"Server started.\n";
-		while(1){}
-		delete myServer;
-	}
-	else{	
-	Client* c = new Client("lenka");
-	CWinThread* crypt = new CWinThread();
-	crypt = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c);
-	Client* c1 = new Client("Janko");
-	CWinThread* crypt1 = new CWinThread();
-	crypt1 = AfxBeginThread(pre_generatingKeyEnc , (LPVOID) c1);
-	string	pokus = c->encipher("ahoj");
-	cout << pokus;
-	pokus = c1->decipher(pokus);
-	cout << pokus;
-	cin.get();
-	}*/
 	if(argc != 2){
 		std::cerr<<"[ERROR] Unknown argument. Use argument \"server\" or \"client\"\n";
 		return 1;
@@ -306,6 +281,7 @@ int main(int argc , char** argv){
 
 			std::getline(std::cin , cmd);
 			if(cmd.size() == 0){std::getline(std::cin , cmd);}
+			if(cmd.size() == 0)cmd = '\n';
 
 			if(cmd[0] == '/'){
 				quit = myClient->command(cmd);
@@ -315,7 +291,7 @@ int main(int argc , char** argv){
 		}
 		delete myClient;
 	}
-	return 0;
+	exit(0);
 }
 
 

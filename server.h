@@ -4,16 +4,21 @@
 #include <list>
 #include <afxwin.h>
 
+#include "polarssl/entropy.h"
+#include "polarssl/ctr_drbg.h"
+
 #include "socket.h"
 #include "struct.h"
+
+
 
 struct User
 {
 		std::string login;
-		std::string password;
+		std::string passwordHash;
 		cert* certificate;
 		int port;
-		User(std::string login,std::string password,cert* certificate):login(login),password(password),certificate(certificate){}
+		User(std::string login,std::string passwordHash,cert* certificate):login(login),passwordHash(passwordHash),certificate(certificate){}
 };
 
 class Server{
