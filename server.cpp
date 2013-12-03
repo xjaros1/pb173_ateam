@@ -3,13 +3,29 @@
 #include <afxwin.h>
 #include <sstream>
 #include <cstdlib>
+#include <fstream>
 
 #include "server.h"
 
 
 
 Server::Server(){
-
+	ifstream database("database.txt");
+	string line;
+	while(getline(database,line)) 
+        {	        
+			vector<string> param = split(line,":");
+			if (param.size()!=2)
+			{
+				string hash = "";
+				for (int i = 1;i<param.size();i++)
+				{
+					hash += param[i];
+				}
+				registeredUsers.push_back(new User(param[0],hash,new cert()));
+			}
+			else registeredUsers.push_back(new User(param[0],param[1],new cert()));
+	    }
 }
 
 string Server::generatePassword()//toto raz bude geneerovat anhodne hesla.. zatial netreba riesit//uz by to malo generovat hesla a treba to riesit
@@ -60,6 +76,10 @@ int Server::registration(std::string login , std::string pwd , cert* userCert)
 	for(int i = 0 ; i < 64 ; i++){pwdHashString.push_back(pwdHash[i]);}
 
 	registeredUsers.push_back(new User(login,pwdHashString,userCert));
+	std::ofstream database;
+	database.open("database.txt", std::ios_base::app);
+	database << login << ":" << pwdHashString << endl;
+	database.close();
 	cout << "Registration successful\n";
 	return 0;
 }
