@@ -3,14 +3,14 @@
 
 #include <list>
 #include <afxwin.h>
-
+#include <windows.h> //mutex
 #include "polarssl/entropy.h"
 #include "polarssl/ctr_drbg.h"
 
 #include "socket.h"
 #include "struct.h"
 
-
+#define THREADCOUNT 5
 
 struct User
 {
@@ -24,13 +24,15 @@ struct User
 class Server{
 	
 private:
-	std::list<User*> registeredUsers;
-	std::list<User*> onlineUsers;
+	_Guarded_by_(ghMutex) std::list<User*> registeredUsers;
+	_Guarded_by_(ghMutex) std::list<User*> onlineUsers;
 	cert certificate;
 	unsigned char publicKey[128];
 	unsigned char privateKey[128];
 	
 public:
+	_Has_lock_kind_( _Lock_kind_mutex_ ) HANDLE ghMutex;
+
 	Server();
 	//static UINT waiting(LPVOID a);
 	//static UINT answer(LPVOID s);
@@ -42,7 +44,7 @@ public:
 	*
 	* @return true when check succesful, false otherwise 
 	*/
-	bool checkCert(cert userCert , unsigned char* CApublicKey);
+	_Check_return_ bool checkCert(_In_ cert userCert , _In_ unsigned char* CApublicKey);
 
 	/**
 	* Register user into database.
@@ -54,7 +56,7 @@ public:
 	*
 	* @return zero when succesful, nonzero value when error occurs
 	*/
-	int registration(std::string login , std::string pwd , cert* userCert);
+	_Check_return_ _Requires_lock_held_(ghMutex) int registration(_In_ std::string login , _In_ std::string pwd , _In_ cert* userCert);
 
 	/**
 	* Generates random AES key.
@@ -63,7 +65,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int randGenAES(unsigned char* key);
+	_Check_return_ int randGenAES(_In_ unsigned char* key);
 
 	/**
 	* Generates random pair of RSA keys.
@@ -73,7 +75,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int randGenRSA(unsigned char* publicKey , unsigned char* privateKey);
+	_Check_return_ int randGenRSA(_In_ unsigned char* publicKey ,_In_ unsigned char* privateKey);
 
 	/**
 	* Encrypts/decrypts given data with AES - 128.
@@ -86,7 +88,7 @@ public:
 	* 
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoSym(unsigned char* key , unsigned char* iv , unsigned char* data , unsigned char* outData  , int mode);
+	_Check_return_ int cryptoSym(_In_ unsigned char* key ,_In_ unsigned char* iv , _In_ unsigned char* data , _Out_ unsigned char* outData  , _In_ int mode);
 
 	/**
 	* Encrypts/decrypts given data with RSA - 1024.
@@ -98,7 +100,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoAsym(unsigned char* key , unsigned char* data , unsigned char* outData , int mode);
+	_Check_return_ int cryptoAsym(unsigned char* key , unsigned char* data , unsigned char* outData , int mode);
 	
 	/**
 	* Creates a hash of given data.
@@ -108,7 +110,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int hash(unsigned char* data , unsigned char* output);
+	_Check_return_ int hash(_In_ unsigned char* data , _In_ unsigned char* output);
 
 	/**
 	* Sends data to client.
@@ -118,7 +120,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int sendData(char *Buf, int len, int Client);
+	_Check_return_ int sendData(_In_reads_(len) char *Buf, _In_ int len, _In_ int Client);
 
 	/**
 	* Adds user into list of online users.
@@ -128,7 +130,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int login(std::string login,std::string password, int port);
+	_Check_return_ _Requires_lock_held_(ghMutex) int login(_In_ std::string login, _In_ std::string password, _In_ int port);
 
 	/**
 	* Removes user from list of online users.
@@ -138,7 +140,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int logout(std::string login);
+	_Check_return_ _Requires_lock_held_(ghMutex) int logout(_In_ std::string login);
 
 	/**
 	* Accepts user's request, takes action based on request type.
@@ -146,16 +148,16 @@ public:
 	* @param requestType type of request
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int requestAccept(int rT);
-	User* getUser(std::string login);
-	User* getOnlineUser(std::string login);
+	_Check_return_ int requestAccept(_In_ int rT);
+	_Check_return_ _Requires_lock_held_(ghMutex) _Ret_notnull_ User* getUser(_In_ std::string login);
+	_Check_return_ _Requires_lock_held_(ghMutex) _Ret_notnull_ User* getOnlineUser(_In_ std::string login);
 		
-	int startServer(int port);
-	int receiveData(char *Buf, int len, int Client);
-	int endSocket();
-	std::string sendlist(std::string login);
-	static string generatePassword();
-	int startClientCommunication(std::string fromC, std::string toClient);
+	_Check_return_ int startServer(_In_ int port);
+	_Check_return_ int receiveData(_In_reads_(len) char *Buf, _In_ int len, _In_ int Client);
+	_Check_return_ int endSocket();
+	_Check_return_ _Requires_lock_held_(ghMutex) _Ret_z_ std::string sendlist(_In_ std::string login);
+	_Check_return_ static _Ret_z_ string generatePassword();
+	_Check_return_ _Requires_lock_held_(ghMutex) int startClientCommunication(_In_ std::string fromC, _In_ std::string toClient);
 };
 
 #endif //SERVER_H

@@ -13,15 +13,10 @@
 #include "struct.h"
 //#include "minunit.h"
 
-
-
 struct adress{
 	std::string IP;
 
 };
-
-
-
 
 class Client{
 public:
@@ -50,7 +45,7 @@ private:
 	adress myAdress;
 	adress partnerAdress;
 public:
-	Client(string login);
+	Client(_In_ string login);
 	/**
 	* Encrypts/decrypts given data with AES - 128.
 	*
@@ -62,7 +57,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoSym(std::string, unsigned char iv[16], std::string data, std::string& outData, int mode);
+	_Check_return_ int cryptoSym(std::string, unsigned char iv[16], std::string data, std::string& outData, int mode);
 
 	/**
 	* Encrypts/decrypts given data with RSA - 1024.
@@ -74,7 +69,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int cryptoAsym(unsigned char key[128] , unsigned char* data , unsigned char* outData , int mode);
+	_Check_return_ int cryptoAsym(unsigned char key[128] , unsigned char* data , unsigned char* outData , int mode);
 
 	/**
 	* Generates random pair of RSA keys.
@@ -84,7 +79,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int randGenRSA(unsigned char* publicKey , unsigned char* privateKey);
+	_Check_return_ int randGenRSA(unsigned char* publicKey , unsigned char* privateKey);
 
 	/**
 	* Requests login to server.
@@ -95,7 +90,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int loginRequest(std::string password);
+	_Check_return_ int loginRequest(_In_ std::string password);
 
 	/**
 	* Requests logout from server.
@@ -105,7 +100,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int logoutRequest(requestType rT , unsigned char* login);
+	_Check_return_ int logoutRequest(requestType rT , unsigned char* login);
 
 	/**
 	* Requests registration on server.
@@ -115,7 +110,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int registrationRequest();
+	_Check_return_ int registrationRequest();
 
 	/**
 	* Requests partner's adress from server, based on partner's login.
@@ -125,7 +120,7 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int adressRequest(requestType rt , unsigned char* partnerLogin);
+	_Check_return_ int adressRequest(requestType rt , unsigned char* partnerLogin);
 
 	/**
 	* Request signed certificate from CA.
@@ -135,26 +130,26 @@ public:
 	*
 	* @return returns zero when succesful, nonzero value otherwise
 	*/
-	int certificateRequest(requestType rt , personInfo PI);
+	_Check_return_ int certificateRequest(requestType rt , personInfo PI);
 
 	/*
 	* Metody pre obsluhu prikazov uzivatela(Lubo)
 	*/
 private:
-	int commandParse(std::string& , std::string);
-	int listRequest();
-	int communicationRequest(std::string);
-	int logoutRequest();
-	int connectToPartner(std::string value);
-	int acceptComm();
-	int declineComm();
-	int endComm();
-	int disconnect();
-	int quit();
+	_Check_return_ int commandParse(_Out_opt_ std::string& , _In_ std::string);
+	_Check_return_ int listRequest();
+	_Check_return_ int communicationRequest(_In_ std::string);
+	_Check_return_ int logoutRequest();
+	_Check_return_ int connectToPartner(_In_ std::string value);
+	_Check_return_ int acceptComm();
+	_Check_return_ int declineComm();
+	_Check_return_ int endComm();
+	_Check_return_ int disconnect();
+	_Check_return_ int quit();
 	void help();
 public:
-	bool command(std::string);
-	int sendMessage(std::string);
+	_Check_return_ bool command(_In_ std::string);
+	_Check_return_ int sendMessage(_In_ std::string);
 
 	/**
 	* XOR given plaintext to pre-generated encryption buffer
@@ -163,7 +158,7 @@ public:
 	*
 	* @return ciphertext
 	*/
-	std::string encipher(std::string text);
+	_Check_return_ _Ret_ std::string encipher(_In_ std::string text);
 
 	/**
 	* XOR given ciphertext to pre-generated decryption buffer
@@ -172,7 +167,7 @@ public:
 	*
 	* @return plaintext
 	*/
-	std::string decipher(std::string text);
+	_Check_return_ _Ret_ std::string decipher(_In_ std::string text);
 };
 
 

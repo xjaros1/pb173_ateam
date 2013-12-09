@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-Client::Client(string login){
+Client::Client(_In_ string login){
 	this->login = login;
 	stop = false;
 	incomingConnection = false;
@@ -17,7 +17,7 @@ Client::Client(string login){
 	}
 }
 
-int Client::registrationRequest(){
+_Check_return_ int Client::registrationRequest(){
 	std::string toSend;
 	toSend = "REG";
 	toSend += ":";
@@ -37,7 +37,8 @@ int Client::registrationRequest(){
 		return -1;
 	}
 }
-int Client::listRequest()
+
+_Check_return_ int Client::listRequest()
 {
 	std::string toSend;
 	toSend = "LIST";
@@ -60,7 +61,8 @@ int Client::listRequest()
 
 	return 0;
 }
-int Client::loginRequest(string password)
+
+_Check_return_ int Client::loginRequest(_In_ string password)
 {
 	std::stringstream toSend;
 	toSend << "LOGIN";
@@ -93,7 +95,7 @@ int Client::loginRequest(string password)
 	return 0;
 }
 
-int Client::communicationRequest(string partnerLogin)
+_Check_return_ int Client::communicationRequest(_In_ string partnerLogin)
 {
 	string toSend = "";
 	toSend += "COMM";
@@ -111,8 +113,7 @@ int Client::communicationRequest(string partnerLogin)
 	return 0;
 }
 
-
-int Client::logoutRequest(){
+_Check_return_ int Client::logoutRequest(){
 	std::stringstream buff;
 	buff<<"LOGOUT:"<<login;
 	activeServerSocket->SendLine(buff.str());
@@ -127,8 +128,7 @@ int Client::logoutRequest(){
 	return 0;
 }
 
-
-int Client::cryptoSym(std::string key, unsigned char iv[16], std::string data, std::string& outData, int mode)
+_Check_return_ int Client::cryptoSym(std::string key, unsigned char iv[16], std::string data, std::string& outData, int mode)
 {
 	if(key.length() < 32)
 		key.append(32 - key.length(), '\0');
@@ -156,9 +156,7 @@ int Client::cryptoSym(std::string key, unsigned char iv[16], std::string data, s
 	return true;
 }
 
-
-
-string Client::encipher(string text)
+_Check_return_ _Ret_ string Client::encipher(_In_ string text)
 {
 	string cipherText;
 	cipherText.resize(text.size());
@@ -177,7 +175,8 @@ string Client::encipher(string text)
 	}
 	return cipherText;
 }
-string Client::decipher(string text)
+
+_Check_return_ _Ret_ string Client::decipher(_In_ string text)
 {
 	string plainText;
 	plainText.resize(text.size());
@@ -197,7 +196,7 @@ string Client::decipher(string text)
 	return plainText;
 }
 
-int Client::connectToPartner(std::string value){
+_Check_return_ int Client::connectToPartner(_In_ std::string value){
 	if(!activePartnerSocket){
 		partnerName = value;
 		communicationRequest(value);
@@ -208,7 +207,7 @@ int Client::connectToPartner(std::string value){
 	}
 }
 
-int Client::acceptComm(){
+_Check_return_ int Client::acceptComm(){
 	if(incomingConnection){
 		std::stringstream buff;
 
@@ -238,7 +237,7 @@ int Client::acceptComm(){
 	}
 }
 
-int Client::declineComm(){
+_Check_return_ int Client::declineComm(){
 	if(incomingConnection){
 		std::string buff;
 		buff = "NO";
@@ -252,7 +251,7 @@ int Client::declineComm(){
 	}
 }
 
-int Client::endComm(){
+_Check_return_ int Client::endComm(){
 	if(activePartnerSocket){
 		std::string buff;
 		buff = "END";
@@ -267,7 +266,7 @@ int Client::endComm(){
 	}
 }
 
-int Client::disconnect(){
+_Check_return_ int Client::disconnect(){
 	if(activeServerSocket){
 		logoutRequest();
 		return 0;
@@ -277,7 +276,7 @@ int Client::disconnect(){
 	}
 }
 
-int Client::quit(){
+_Check_return_ int Client::quit(){
 	if(activePartnerSocket){
 		endComm();
 	}
@@ -287,7 +286,7 @@ int Client::quit(){
 	return 0;
 }
 
-int Client::sendMessage(std::string value){
+_Check_return_ int Client::sendMessage(_In_ std::string value){
 	if(activePartnerSocket){
 		std::string mess = "MESS:" + value;
 		mess = encipher(mess);
@@ -299,7 +298,7 @@ int Client::sendMessage(std::string value){
 	}
 }
 
-bool Client::command(std::string cmd){
+_Check_return_ bool Client::command(_In_ std::string cmd){
 	int action;
 	std::string value;
 	action = commandParse(value , cmd);
@@ -339,7 +338,7 @@ bool Client::command(std::string cmd){
 	return false;
 }
 
-int Client::commandParse(std::string& value , std::string cmd){
+_Check_return_ int Client::commandParse(_Out_opt_ std::string& value , _In_ std::string cmd){
 	std::vector<string> command = split(cmd , ":");
 	if(command.size() > 1)
 		value = command[1];

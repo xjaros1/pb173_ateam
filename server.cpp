@@ -26,9 +26,10 @@ Server::Server(){
 			}
 			else registeredUsers.push_back(new User(param[0],param[1],new cert()));
 	    }
+	ghMutex = CreateMutex( NULL, FALSE, NULL);
 }
 
-string Server::generatePassword()//toto raz bude geneerovat anhodne hesla.. zatial netreba riesit//uz by to malo generovat hesla a treba to riesit
+_Check_return_ _Ret_z_ string Server::generatePassword()//toto raz bude geneerovat anhodne hesla.. zatial netreba riesit//uz by to malo generovat hesla a treba to riesit
 {
 	unsigned char pwd[10];
 	std::string password;
@@ -59,7 +60,7 @@ string Server::generatePassword()//toto raz bude geneerovat anhodne hesla.. zati
 	return password;
 }
 
-int Server::registration(std::string login , std::string pwd , cert* userCert)
+_Check_return_ _Requires_lock_held_(ghMutex) int Server::registration(_In_ std::string login , _In_ std::string pwd , _In_ cert* userCert)
 {
 	cout <<"Client "<<login<<" is trying to register\n";
 	if (getUser(login)!=NULL) {cout<< "[ERROR] User is already registered.\n"; return 1;}
@@ -84,7 +85,7 @@ int Server::registration(std::string login , std::string pwd , cert* userCert)
 	return 0;
 }
 
-User* Server::getUser(std::string login)
+_Check_return_ _Requires_lock_held_(ghMutex) _Ret_notnull_ User* Server::getUser(_In_ std::string login)
 {
 	if (registeredUsers.empty()) return NULL;
 	list<User*>::iterator iter;
@@ -94,7 +95,8 @@ User* Server::getUser(std::string login)
 	}
 	return NULL;
 }
-User* Server::getOnlineUser(std::string login)
+
+_Check_return_ _Requires_lock_held_(ghMutex) _Ret_notnull_ User* Server::getOnlineUser(_In_ std::string login)
 {
 	if (onlineUsers.empty()) return NULL;
 	list<User*>::iterator iter;
@@ -105,7 +107,7 @@ User* Server::getOnlineUser(std::string login)
 	return NULL;
 }
 
-int Server::login(std::string login,std::string password, int port)
+_Check_return_ _Requires_lock_held_(ghMutex) int Server::login(_In_ std::string login, _In_ std::string password, _In_ int port)
 {
 	cout << "User " <<login <<" is trying to log in.\n";
 	User* u = getOnlineUser(login);
@@ -128,7 +130,8 @@ int Server::login(std::string login,std::string password, int port)
 	cout << "Login successful.\n";
 	return 0;
 }
-string Server::sendlist(std::string login)
+
+_Check_return_ _Requires_lock_held_(ghMutex) _Ret_z_ string Server::sendlist(_In_ std::string login)
 {
 	User* u = getOnlineUser(login);
 	if (!u) {cout << "[ERROR] User not online, cannot send online list.\n"; return "NOK:Sorry, you have to login first.";}
@@ -143,7 +146,7 @@ string Server::sendlist(std::string login)
 	return result;
 }
 
-int Server::startClientCommunication(std::string fromC, std::string toC)
+_Check_return_ _Requires_lock_held_(ghMutex) int Server::startClientCommunication(_In_ std::string fromC, _In_ std::string toC)
 {
 	cout << "Client " << fromC << " is trying to establish communication with us " << toC <<endl;
 	User* f = getOnlineUser(fromC);
@@ -170,7 +173,7 @@ int Server::startClientCommunication(std::string fromC, std::string toC)
 	return 0;
 }
 
-int Server::logout(std::string login){
+_Check_return_ _Requires_lock_held_(ghMutex) int Server::logout(_In_ std::string login){
 	cout << "User "<<login <<" wants to logout.\n";
 	User* u = getUser(login);
 	if (!u) {cout << "[ERROR] User is not registered.\n"; return -1;}
